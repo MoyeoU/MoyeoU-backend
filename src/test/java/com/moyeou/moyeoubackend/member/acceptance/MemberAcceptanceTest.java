@@ -2,7 +2,7 @@ package com.moyeou.moyeoubackend.member.acceptance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moyeou.moyeoubackend.common.exception.ErrorResponse;
-import com.moyeou.moyeoubackend.member.acceptance.request.SignUpRequest;
+import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
-package com.moyeou.moyeoubackend.member.acceptance;
+package com.moyeou.moyeoubackend.member.controller;
 
-import com.moyeou.moyeoubackend.member.acceptance.request.SignUpRequest;
+import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
