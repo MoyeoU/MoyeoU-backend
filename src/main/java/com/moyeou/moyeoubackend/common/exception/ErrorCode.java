@@ -9,7 +9,15 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     INVALID_REQUEST_PARAMS("4000", "요청 파라미터가 잘못되었습니다.", HttpStatus.BAD_REQUEST),
 
-    DUPLICATE_MEMBER("4001", "이미 가입한 회원입니다", HttpStatus.BAD_REQUEST);
+    DUPLICATE_MEMBER("4001", "이미 가입한 회원입니다.", HttpStatus.BAD_REQUEST),
+
+    NON_EXISTENT_EMAIL("4002", "가입된 회원이 아닙니다.", HttpStatus.BAD_REQUEST),
+
+    INCORRECT_PASSWORD("4003", "비밀번호가 틀렸습니다.", HttpStatus.BAD_REQUEST),
+
+    UNAUTHORIZED_ACCESS("4004", "접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
+
+    UNAUTHENTICATED("4005", "인증되지 않음", HttpStatus.UNAUTHORIZED);
 
     private final String code;
     private final String message;
