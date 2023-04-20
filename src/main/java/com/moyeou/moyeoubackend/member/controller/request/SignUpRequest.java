@@ -1,4 +1,4 @@
-package com.moyeou.moyeoubackend.member.acceptance.request;
+package com.moyeou.moyeoubackend.member.controller.request;
 
 import com.moyeou.moyeoubackend.member.domain.Member;
 import lombok.AllArgsConstructor;

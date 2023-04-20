@@ -1,6 +1,6 @@
 package com.moyeou.moyeoubackend.member.service;
 
-import com.moyeou.moyeoubackend.member.acceptance.request.SignUpRequest;
+import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.member.exception.DuplicateMemberException;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
