@@ -1,4 +1,4 @@
-package com.moyeou.moyeoubackend.auth;
+package com.moyeou.moyeoubackend.auth.supports;
 
 import com.moyeou.moyeoubackend.member.domain.Member;
 import org.springframework.security.core.GrantedAuthority;

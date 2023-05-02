@@ -1,5 +1,6 @@
-package com.moyeou.moyeoubackend.auth;
+package com.moyeou.moyeoubackend.auth.supports;
 
+import com.moyeou.moyeoubackend.auth.service.CustomUserDetailsService;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;

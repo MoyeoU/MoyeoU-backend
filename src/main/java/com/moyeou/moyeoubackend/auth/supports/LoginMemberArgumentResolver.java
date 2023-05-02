@@ -1,4 +1,4 @@
-package com.moyeou.moyeoubackend.auth;
+package com.moyeou.moyeoubackend.auth.supports;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;

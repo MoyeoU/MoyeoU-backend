@@ -1,4 +1,4 @@
-package com.moyeou.moyeoubackend.auth;
+package com.moyeou.moyeoubackend.auth.supports;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
