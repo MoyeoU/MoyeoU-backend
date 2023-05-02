@@ -20,7 +20,8 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         UserDetails userDetails = (UserDetails) SecurityContextHolder
                 .getContext()
-                .getAuthentication();
+                .getAuthentication()
+                .getPrincipal();
 
         return Long.parseLong(userDetails.getUsername());
     }

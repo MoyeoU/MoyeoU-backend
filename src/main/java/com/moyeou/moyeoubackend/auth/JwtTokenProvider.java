@@ -49,7 +49,7 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         String userId = extractMemberId(token, secretKey);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
-        return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword());
+        return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
     public String extractToken(HttpServletRequest request) {
