@@ -17,7 +17,9 @@ public enum ErrorCode {
 
     UNAUTHORIZED_ACCESS("4004", "접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
-    UNAUTHENTICATED("4005", "인증되지 않음", HttpStatus.UNAUTHORIZED);
+    UNAUTHENTICATED("4005", "인증되지 않음", HttpStatus.UNAUTHORIZED),
+
+    STORAGE_EXCEPTION("5000", "저장소 예외", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
     private final String message;

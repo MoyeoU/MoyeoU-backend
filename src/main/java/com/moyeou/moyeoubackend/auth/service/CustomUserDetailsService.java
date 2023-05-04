@@ -1,5 +1,6 @@
-package com.moyeou.moyeoubackend.auth;
+package com.moyeou.moyeoubackend.auth.service;
 
+import com.moyeou.moyeoubackend.auth.supports.CustomUserDetails;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

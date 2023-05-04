@@ -13,7 +13,19 @@ public class MoyeouException extends RuntimeException {
         this(errorCode.getCode(), errorCode.getMessage(), errorCode.getStatus());
     }
 
+    public MoyeouException(ErrorCode errorCode, String message) {
+        this(errorCode.getCode(), message, errorCode.getStatus());
+    }
+
+    public MoyeouException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.code = errorCode.getCode();
+        this.message = message;
+        this.status = errorCode.getStatus();
+    }
+
     public MoyeouException(String code, String message, HttpStatus status) {
+        super(message);
         this.code = code;
         this.message = message;
         this.status = status;

@@ -1,4 +1,4 @@
-package com.moyeou.moyeoubackend.auth;
+package com.moyeou.moyeoubackend.auth.supports;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

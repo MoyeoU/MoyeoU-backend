@@ -1,6 +1,6 @@
 package com.moyeou.moyeoubackend.auth.service;
 
-import com.moyeou.moyeoubackend.auth.JwtTokenProvider;
+import com.moyeou.moyeoubackend.auth.supports.JwtTokenProvider;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
 import com.moyeou.moyeoubackend.auth.controller.response.RefreshResponse;
