@@ -82,7 +82,7 @@ public class AuthAcceptanceTest {
         String refreshToken = loginResponse.getRefreshToken();
 
         mockMvc.perform(post("/refresh")
-                        .header("Authorization", "Bearer " + refreshToken)
+                        .content("{\"refreshToken\" :\"" + refreshToken +"\"}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").exists())
