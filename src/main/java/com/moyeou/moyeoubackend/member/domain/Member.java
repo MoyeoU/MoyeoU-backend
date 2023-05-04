@@ -47,4 +47,10 @@ public class Member {
         this.nickname = nickname;
         this.password = password;
     }
+
+    public void update(String introduction, String nickname, String imagePath) {
+        this.introduction = introduction;
+        this.nickname = nickname;
+        this.imagePath = imagePath;
+    }
 }
