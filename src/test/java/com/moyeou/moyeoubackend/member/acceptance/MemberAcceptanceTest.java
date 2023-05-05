@@ -1,6 +1,8 @@
 package com.moyeou.moyeoubackend.member.acceptance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
+import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
 import com.moyeou.moyeoubackend.common.exception.ErrorResponse;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
@@ -77,6 +80,23 @@ class MemberAcceptanceTest {
 
         ErrorResponse errorResponse = objectMapper.readValue(response, ErrorResponse.class);
         assertThat(errorResponse.getCode()).isEqualTo("4001");
+    }
+
+    @DisplayName("회원을 탈퇴한다")
+    @Test
+    void delete() throws Exception {
+        signUp("example@o.cnu.ac.kr", "pw");
+        var request = new LoginRequest("example@o.cnu.ac.kr", "pw");
+        var response = postApiCall("/login", request)
+                .andReturn()
+                .getResponse()
+                .getContentAsString(UTF_8);
+        LoginResponse loginResponse = objectMapper.readValue(response, LoginResponse.class);
+        String accessToken = loginResponse.getAccessToken();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/members/me")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk());
     }
 
     private void signUp(String email, String password) throws Exception {
