@@ -37,6 +37,11 @@ public class MemberService {
         member.update(request.getIntroduction(), request.getNickname(), path);
     }
 
+    @Transactional
+    public void delete(Long memberId) {
+        memberRepository.deleteById(memberId);
+    }
+
     private Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("회원(memberId: " + memberId + ")이 존재하지 않습니다."));

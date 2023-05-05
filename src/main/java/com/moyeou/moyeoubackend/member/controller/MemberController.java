@@ -26,4 +26,9 @@ public class MemberController {
     public void update(@LoginMember Long memberId, @Valid UpdateRequest request) {
         memberService.update(memberId, request);
     }
+
+    @DeleteMapping("/members/me")
+    public void delete(@LoginMember Long memberId) {
+        memberService.delete(memberId);
+    }
 }
