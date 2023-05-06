@@ -36,7 +36,8 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(STATELESS);
         http
                 .authorizeRequests()
-                .anyRequest().permitAll();
+                .antMatchers("/sign-up", "/login", "/refresh").permitAll()
+                .anyRequest().authenticated();
         return http.build();
     }
 
