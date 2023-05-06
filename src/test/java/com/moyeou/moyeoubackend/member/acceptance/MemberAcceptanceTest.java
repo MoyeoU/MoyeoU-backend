@@ -5,6 +5,7 @@ import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
 import com.moyeou.moyeoubackend.common.exception.ErrorResponse;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
+import com.moyeou.moyeoubackend.member.controller.response.MemberResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +21,7 @@ import java.util.Map;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,15 +38,7 @@ class MemberAcceptanceTest {
     @DisplayName("회원가입한다")
     @Test
     void save() throws Exception {
-        var request = new SignUpRequest("example@o.cnu.ac.kr", "컴퓨터융합학부", 202000000, "nick", "pw");
-        String response = mockMvc.perform(post("/sign-up")
-                        .content(objectMapper.writeValueAsString(request))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
-
+        var response = signUp("example@o.cnu.ac.kr", "pw");
         assertThat(response).startsWith("/members/");
     }
 
@@ -53,7 +46,9 @@ class MemberAcceptanceTest {
     @Test
     void signUpWithInvalidParameter() throws Exception {
         var request = new SignUpRequest("", "", 202000000, "nick", "pw");
-        String response = postApiCall("/sign-up", request)
+        String response = mockMvc.perform(post("/sign-up")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse()
@@ -72,7 +67,9 @@ class MemberAcceptanceTest {
     void duplicateSignUp() throws Exception {
         signUp("example@o.cnu.ac.kr", "pw");
         var request = new SignUpRequest("example@o.cnu.ac.kr", "컴퓨터융합학부", 202000000, "nick", "pw");
-        String response = postApiCall("/sign-up", request)
+        String response = mockMvc.perform(post("/sign-up")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse()
@@ -82,34 +79,77 @@ class MemberAcceptanceTest {
         assertThat(errorResponse.getCode()).isEqualTo("4001");
     }
 
+    @DisplayName("내 정보를 조회한다")
+    @Test
+    void findMe() throws Exception {
+        signUp("example@o.cnu.ac.kr", "pw");
+        var accessToken = login("example@o.cnu.ac.kr", "pw");
+
+        var myInfo = mockMvc.perform(get("/members/me")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(UTF_8);
+
+        MemberResponse memberResponse = objectMapper.readValue(myInfo, MemberResponse.class);
+        assertAll(
+                () -> assertThat(memberResponse.getNickname()).isEqualTo("nick"),
+                () -> assertThat(memberResponse.getEmail()).isEqualTo("example@o.cnu.ac.kr")
+        );
+    }
+
+    @DisplayName("다른 회원의 정보를 조회한다")
+    @Test
+    void findMember() throws Exception {
+        var uri = signUp("example@o.cnu.ac.kr", "pw");
+
+        signUp("ex@o.cnu.ac.kr", "ex");
+        var accessToken = login("ex@o.cnu.ac.kr", "ex");
+
+        var memberInfo = mockMvc.perform(get(uri)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(UTF_8);
+        MemberResponse memberResponse = objectMapper.readValue(memberInfo, MemberResponse.class);
+        assertThat(memberResponse.getEmail()).isEqualTo("example@o.cnu.ac.kr");
+    }
+
     @DisplayName("회원을 탈퇴한다")
     @Test
     void delete() throws Exception {
         signUp("example@o.cnu.ac.kr", "pw");
-        var request = new LoginRequest("example@o.cnu.ac.kr", "pw");
-        var response = postApiCall("/login", request)
-                .andReturn()
-                .getResponse()
-                .getContentAsString(UTF_8);
-        LoginResponse loginResponse = objectMapper.readValue(response, LoginResponse.class);
-        String accessToken = loginResponse.getAccessToken();
+        var accessToken = login("example@o.cnu.ac.kr", "pw");
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/members/me")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk());
     }
 
-    private void signUp(String email, String password) throws Exception {
+    private String signUp(String email, String password) throws Exception {
         var request = new SignUpRequest(email, "컴퓨터융합학부", 202000000, "nick", password);
-        mockMvc.perform(post("/sign-up")
+        return mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getHeader("Location");
     }
 
-    private ResultActions postApiCall(String url, Object request) throws Exception {
-        return mockMvc.perform(post(url)
-                .content(objectMapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON));
+    private String login(String email, String password) throws Exception {
+        var request = new LoginRequest(email, password);
+        var response =  mockMvc.perform(post("/login")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(UTF_8);
+
+        LoginResponse loginResponse = objectMapper.readValue(response, LoginResponse.class);
+        return loginResponse.getAccessToken();
     }
 }
