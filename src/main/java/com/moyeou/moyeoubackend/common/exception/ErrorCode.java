@@ -19,6 +19,8 @@ public enum ErrorCode {
 
     UNAUTHENTICATED("4005", "인증되지 않음", HttpStatus.UNAUTHORIZED),
 
+    ENTITY_NOT_FOUND("4006", "엔티티를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+
     STORAGE_EXCEPTION("5000", "저장소 예외", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;

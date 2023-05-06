@@ -8,10 +8,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.moyeou.moyeoubackend.common.exception.ErrorCode.ENTITY_NOT_FOUND;
 import static com.moyeou.moyeoubackend.common.exception.ErrorCode.INVALID_REQUEST_PARAMS;
 
 @Slf4j
@@ -24,6 +26,14 @@ public class GlobalExceptionHandler {
         log.warn("[{}|{}] resultCode: {}, resultMessage: {}, resultErrors: {}",
                 request.getRequestURI(), request.getMethod(), response.getCode(), response.getMessage(), response.getErrors());
         return new ResponseEntity<>(response, INVALID_REQUEST_PARAMS.getStatus());
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(ENTITY_NOT_FOUND.getCode(), exception.getMessage());
+        log.warn("[{}|{}] resultCode: {}, resultMessage: {}",
+                request.getRequestURI(), request.getMethod(), response.getCode(), response.getMessage());
+        return new ResponseEntity<>(response, ENTITY_NOT_FOUND.getStatus());
     }
 
     @ExceptionHandler(MoyeouException.class)
