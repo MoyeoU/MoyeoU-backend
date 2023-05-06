@@ -3,6 +3,7 @@ package com.moyeou.moyeoubackend.member.service;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.member.controller.request.UpdateRequest;
 import com.moyeou.moyeoubackend.file.service.FileSystemStorageService;
+import com.moyeou.moyeoubackend.member.controller.response.MemberResponse;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.exception.DuplicateMemberException;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
@@ -28,6 +29,11 @@ public class MemberService {
         }
         String password = passwordEncoder.encode(request.getPassword());
         return memberRepository.save(request.toEntity(password)).getId();
+    }
+
+    public MemberResponse find(Long memberId) {
+        Member member = findById(memberId);
+        return MemberResponse.from(member);
     }
 
     @Transactional
