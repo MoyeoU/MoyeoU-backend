@@ -72,4 +72,8 @@ public class Post {
     public void addPostHashtag(List<PostHashtag> postHashtags) {
         this.postHashtags = postHashtags;
     }
+
+    public boolean isHost(Member member) {
+        return host.equals(member);
+    }
 }
