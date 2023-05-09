@@ -5,9 +5,7 @@ import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -21,5 +19,10 @@ public class PostController {
     public ResponseEntity<Void> post(@Valid @RequestBody CreateRequest request, @LoginMember Long memberId) {
         Long postId = postService.create(request, memberId);
         return ResponseEntity.created(URI.create("/posts/" + postId)).build();
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public void delete(@PathVariable Long postId, @LoginMember Long memberId) {
+        postService.delete(postId, memberId);
     }
 }

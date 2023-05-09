@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.post.service;
 
+import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
@@ -37,8 +38,23 @@ public class PostService {
         return post.getId();
     }
 
+    @Transactional
+    public void delete(Long postId, Long memberId) {
+        Member host = findByMemberId(memberId);
+        Post post = findByPostId(postId);
+        if (!post.isHost(host)) {
+            throw new UnAuthorizedException("작성자만 삭제할 수 있습니다.");
+        }
+        postRepository.deleteById(post.getId());
+    }
+
     private Member findByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("회원(memberId: " + memberId + ")이 존재하지 않습니다."));
+    }
+
+    private Post findByPostId(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시물(postId: " + postId + ")이 존재하지 않습니다."));
     }
 }
