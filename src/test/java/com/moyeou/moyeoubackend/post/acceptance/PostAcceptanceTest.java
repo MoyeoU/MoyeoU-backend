@@ -61,7 +61,7 @@ public class PostAcceptanceTest {
     void create() throws Exception {
         signUp("example@o.cnu.ac.kr", "pw");
         String accessToken = login("example@o.cnu.ac.kr", "pw");
-        var post = new CreateRequest("JPA 스터디", 4, "대면", "06-01", "3개월", Arrays.asList("Java", "JPA", "Spring"));
+        var post = new CreateRequest("JPA 스터디", 4, "대면", "06-01", "3개월", "<h1>같이 공부해요!</h1>", Arrays.asList("Java", "JPA", "Spring"));
 
         String location = mockMvc.perform(post("/posts")
                         .header("Authorization", "Bearer " + accessToken)

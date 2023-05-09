@@ -18,6 +18,7 @@ public class CreateRequest {
     private String operationWay;
     private String expectedDate;
     private String estimatedDuration;
+    private String content;
     private List<String> hashtags;
 
     public Post toEntity(Member host) {
@@ -28,6 +29,7 @@ public class CreateRequest {
                 operationWay,
                 expectedDate,
                 estimatedDuration,
+                content,
                 PROGRESS,
                 host,
                 new ArrayList<>()
