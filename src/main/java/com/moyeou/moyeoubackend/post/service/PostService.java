@@ -4,6 +4,7 @@ import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
+import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.domain.Post;
 import com.moyeou.moyeoubackend.post.domain.PostHashtag;
@@ -36,6 +37,15 @@ public class PostService {
         }
         post.addPostHashtag(postHashtags);
         return post.getId();
+    }
+
+    public PostResponse find(Long postId, Long memberId) {
+        Post post = findByPostId(postId);
+        Member member = findByMemberId(memberId);
+        if (post.isHost(member)) {
+            return PostResponse.from(post, true);
+        }
+        return PostResponse.from(post, false);
     }
 
     @Transactional

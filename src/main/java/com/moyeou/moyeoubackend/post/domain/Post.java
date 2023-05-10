@@ -42,6 +42,9 @@ public class Post {
     @Column(name = "estimated_duration", nullable = false)
     private String estimatedDuration;
 
+    @Column(name = "content", nullable = false)
+    private String content;
+
     @Enumerated(value = STRING)
     @Column(name = "status", nullable = false)
     private PostStatus status;
@@ -57,13 +60,14 @@ public class Post {
     private List<PostHashtag> postHashtags = new ArrayList<>();
 
     public Post(String title, Integer headCount, Integer currentCount, String operationWay, String expectedDate,
-                String estimatedDuration, PostStatus status, Member host, List<PostHashtag> postHashtags) {
+                String estimatedDuration, String content, PostStatus status, Member host, List<PostHashtag> postHashtags) {
         this.title = title;
         this.headCount = headCount;
         this.currentCount = currentCount;
         this.operationWay = operationWay;
         this.expectedDate = expectedDate;
         this.estimatedDuration = estimatedDuration;
+        this.content = content;
         this.status = status;
         this.host = host;
         this.postHashtags = postHashtags;

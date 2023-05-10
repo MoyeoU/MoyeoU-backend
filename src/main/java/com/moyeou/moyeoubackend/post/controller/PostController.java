@@ -2,6 +2,7 @@ package com.moyeou.moyeoubackend.post.controller;
 
 import com.moyeou.moyeoubackend.auth.supports.LoginMember;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
+import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,14 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("/posts")
-    public ResponseEntity<Void> post(@Valid @RequestBody CreateRequest request, @LoginMember Long memberId) {
+    public ResponseEntity<Void> create(@Valid @RequestBody CreateRequest request, @LoginMember Long memberId) {
         Long postId = postService.create(request, memberId);
         return ResponseEntity.created(URI.create("/posts/" + postId)).build();
+    }
+
+    @GetMapping("/posts/{postId}")
+    public PostResponse find(@PathVariable Long postId, @LoginMember Long memberId) {
+        return postService.find(postId, memberId);
     }
 
     @DeleteMapping("/posts/{postId}")
