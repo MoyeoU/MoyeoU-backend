@@ -1,6 +1,6 @@
 package com.moyeou.moyeoubackend.post.acceptance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moyeou.moyeoubackend.AcceptanceTest;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
@@ -12,11 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
@@ -27,16 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-public class PostAcceptanceTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
+public class PostAcceptanceTest extends AcceptanceTest {
     @Autowired
     private HashtagRepository hashtagRepository;
 
@@ -80,8 +67,8 @@ public class PostAcceptanceTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString(UTF_8);
-        PostResponse postResponse = objectMapper.readValue(response, PostResponse.class);
 
+        PostResponse postResponse = objectMapper.readValue(response, PostResponse.class);
         assertAll(
                 () -> assertThat(location).startsWith("/posts/"),
                 () -> assertThat(postResponse.getContent()).isEqualTo("<h1>같이 공부해요!</h1>"),
