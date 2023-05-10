@@ -1,6 +1,7 @@
 package com.moyeou.moyeoubackend.post.domain;
 
 import com.moyeou.moyeoubackend.member.domain.Member;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -59,6 +60,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     private List<PostHashtag> postHashtags = new ArrayList<>();
 
+    @Builder
     public Post(String title, Integer headCount, Integer currentCount, String operationWay, String expectedDate,
                 String estimatedDuration, String content, PostStatus status, Member host, List<PostHashtag> postHashtags) {
         this.title = title;

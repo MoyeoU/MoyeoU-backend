@@ -2,6 +2,7 @@ package com.moyeou.moyeoubackend.member.controller.request;
 
 import com.moyeou.moyeoubackend.member.domain.Member;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignUpRequest {

@@ -35,16 +35,14 @@ public class AuthAcceptanceTest {
     @Test
     void login() throws Exception {
         signUp("example@o.cnu.ac.kr", "pw");
-        var request = new LoginRequest("example@o.cnu.ac.kr", "pw");
-        postApiCall("/login", request)
+        postApiCall("/login", new LoginRequest("example@o.cnu.ac.kr", "pw"))
                 .andExpect(status().isOk());
     }
 
     @DisplayName("가입하지 않은 사람이 로그인한다")
     @Test
     void loginByNonMember() throws Exception {
-        var request = new LoginRequest("example@o.cnu.ac.kr", "pw");
-        String response = postApiCall("/login", request)
+        String response = postApiCall("/login", new LoginRequest("example@o.cnu.ac.kr", "pw"))
                 .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse()
@@ -54,12 +52,11 @@ public class AuthAcceptanceTest {
         assertThat(errorResponse.getCode()).isEqualTo("4002");
     }
 
-    @DisplayName("틀린 비밀번호를 입력한다")
+    @DisplayName("틀린 비밀번호로 로그인한다")
     @Test
     void loginWithWrongPassword() throws Exception {
         signUp("example@o.cnu.ac.kr", "pw");
-        var request = new LoginRequest("example@o.cnu.ac.kr", "pwpw");
-        String response = postApiCall("/login", request)
+        String response = postApiCall("/login", new LoginRequest("example@o.cnu.ac.kr", "pwpw"))
                 .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse()
@@ -90,7 +87,13 @@ public class AuthAcceptanceTest {
     }
 
     private void signUp(String email, String password) throws Exception {
-        var request = new SignUpRequest(email, "컴퓨터융합학부", 202000000, "nick", password);
+        var request = SignUpRequest.builder()
+                .email(email)
+                .department("컴퓨터융합학부")
+                .studentNumber(202000000)
+                .nickname("nick")
+                .password(password)
+                .build();
         mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))

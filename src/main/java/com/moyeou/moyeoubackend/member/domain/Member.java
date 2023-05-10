@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.member.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -40,6 +41,7 @@ public class Member {
     @Column(name = "point")
     private Double point;
 
+    @Builder
     public Member(String email, String department, Integer studentNumber, String nickname, String password) {
         this.email = email;
         this.department = department;
