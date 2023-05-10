@@ -55,7 +55,15 @@ public class PostAcceptanceTest {
         String member2 = signUpLogin("ex@o.cnu.ac.kr", "password");
 
         // member1 : 게시물 생성
-        var post = new CreateRequest("JPA 스터디", 4, "대면", "06-01", "3개월", "<h1>같이 공부해요!</h1>", Arrays.asList("Java", "JPA", "Spring"));
+        var post = CreateRequest.builder()
+                .title("JPA 스터디")
+                .headCount(4)
+                .operationWay("대면")
+                .expectedDate("06-01")
+                .estimatedDuration("3개월")
+                .content("<h1>같이 공부해요!</h1>")
+                .hashtags(Arrays.asList("Java", "JPA", "Spring"))
+                .build();
         String location = mockMvc.perform(post("/posts")
                         .header("Authorization", "Bearer " + member1)
                         .content(objectMapper.writeValueAsString(post))
@@ -83,7 +91,13 @@ public class PostAcceptanceTest {
     }
 
     private String signUpLogin(String email, String password) throws Exception {
-        var request = new SignUpRequest(email, "컴퓨터융합학부", 202000000, "nick", password);
+        var request = SignUpRequest.builder()
+                .email(email)
+                .department("컴퓨터융합학부")
+                .studentNumber(202000000)
+                .nickname("nick")
+                .password(password)
+                .build();
         mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))

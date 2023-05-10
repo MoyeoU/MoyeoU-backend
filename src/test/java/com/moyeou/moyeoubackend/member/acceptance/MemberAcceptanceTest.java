@@ -45,7 +45,13 @@ class MemberAcceptanceTest {
     @DisplayName("유효하지 않은 파라미터로 회원가입한다")
     @Test
     void signUpWithInvalidParameter() throws Exception {
-        var request = new SignUpRequest("", "", 202000000, "nick", "pw");
+        var request = SignUpRequest.builder()
+                .email("")
+                .department("")
+                .studentNumber(202000000)
+                .nickname("nick")
+                .password("pw")
+                .build();
         String response = mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -66,7 +72,13 @@ class MemberAcceptanceTest {
     @Test
     void duplicateSignUp() throws Exception {
         signUp("example@o.cnu.ac.kr", "pw");
-        var request = new SignUpRequest("example@o.cnu.ac.kr", "컴퓨터융합학부", 202000000, "nick", "pw");
+        var request = SignUpRequest.builder()
+                .email("example@o.cnu.ac.kr")
+                .department("컴퓨터융합학부")
+                .studentNumber(202000000)
+                .nickname("nick")
+                .password("pw")
+                .build();
         String response = mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -129,7 +141,13 @@ class MemberAcceptanceTest {
     }
 
     private String signUp(String email, String password) throws Exception {
-        var request = new SignUpRequest(email, "컴퓨터융합학부", 202000000, "nick", password);
+        var request = SignUpRequest.builder()
+                .email(email)
+                .department("컴퓨터융합학부")
+                .studentNumber(202000000)
+                .nickname("nick")
+                .password(password)
+                .build();
         return mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -140,9 +158,8 @@ class MemberAcceptanceTest {
     }
 
     private String login(String email, String password) throws Exception {
-        var request = new LoginRequest(email, password);
         var response =  mockMvc.perform(post("/login")
-                        .content(objectMapper.writeValueAsString(request))
+                        .content(objectMapper.writeValueAsString(new LoginRequest(email, password)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
