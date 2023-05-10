@@ -4,13 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
-import com.moyeou.moyeoubackend.member.domain.Member;
-import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
+import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
-import com.moyeou.moyeoubackend.post.domain.Post;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
-import com.moyeou.moyeoubackend.post.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +23,7 @@ import java.util.Arrays;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,12 +38,6 @@ public class PostAcceptanceTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
     private HashtagRepository hashtagRepository;
 
     @BeforeEach
@@ -55,16 +47,17 @@ public class PostAcceptanceTest {
         hashtagRepository.save(new Hashtag("Spring"));
     }
 
-
-    @DisplayName("게시물을 생성한다")
+    @DisplayName("게시물을 생성하고, 조회한다.")
     @Test
-    void create() throws Exception {
-        signUp("example@o.cnu.ac.kr", "pw");
-        String accessToken = login("example@o.cnu.ac.kr", "pw");
-        var post = new CreateRequest("JPA 스터디", 4, "대면", "06-01", "3개월", "<h1>같이 공부해요!</h1>", Arrays.asList("Java", "JPA", "Spring"));
+    void createAndFind() throws Exception {
+        // member1, member2 회원가입, 로그인
+        String member1 = signUpLogin("example@o.cnu.ac.kr", "pw");
+        String member2 = signUpLogin("ex@o.cnu.ac.kr", "password");
 
+        // member1 : 게시물 생성
+        var post = new CreateRequest("JPA 스터디", 4, "대면", "06-01", "3개월", "<h1>같이 공부해요!</h1>", Arrays.asList("Java", "JPA", "Spring"));
         String location = mockMvc.perform(post("/posts")
-                        .header("Authorization", "Bearer " + accessToken)
+                        .header("Authorization", "Bearer " + member1)
                         .content(objectMapper.writeValueAsString(post))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -72,31 +65,32 @@ public class PostAcceptanceTest {
                 .getResponse()
                 .getHeader("location");
 
-        Post savedPost = postRepository.findById(Long.parseLong(location.substring(7))).get();
-        Member member = memberRepository.findByEmail("example@o.cnu.ac.kr").get();
+        // member2 : 게시물 조회
+        String response = mockMvc.perform(get(location)
+                        .header("Authorization", "Bearer " + member2))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(UTF_8);
+        PostResponse postResponse = objectMapper.readValue(response, PostResponse.class);
 
         assertAll(
                 () -> assertThat(location).startsWith("/posts/"),
-                () -> assertThat(savedPost.getPostHashtags().size()).isEqualTo(3),
-                () -> assertThat(savedPost.getHost()).isEqualTo(member)
+                () -> assertThat(postResponse.getContent()).isEqualTo("<h1>같이 공부해요!</h1>"),
+                () -> assertThat(postResponse.getIsHost()).isFalse(),
+                () -> assertThat(postResponse.getHashtags()).containsExactly("Java", "JPA", "Spring")
         );
     }
 
-    private String signUp(String email, String password) throws Exception {
+    private String signUpLogin(String email, String password) throws Exception {
         var request = new SignUpRequest(email, "컴퓨터융합학부", 202000000, "nick", password);
-        return mockMvc.perform(post("/sign-up")
+        mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
-    }
+                .andExpect(status().isCreated());
 
-    private String login(String email, String password) throws Exception {
-        var request = new LoginRequest(email, password);
         var response =  mockMvc.perform(post("/login")
-                        .content(objectMapper.writeValueAsString(request))
+                        .content(objectMapper.writeValueAsString(new LoginRequest(email, password)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
