@@ -21,6 +21,8 @@ public enum ErrorCode {
 
     ENTITY_NOT_FOUND("4006", "엔티티를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
+    ILLEGAL_STATE("4007", "IllegalStateException", HttpStatus.BAD_REQUEST),
+
     STORAGE_EXCEPTION("5000", "저장소 예외", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
