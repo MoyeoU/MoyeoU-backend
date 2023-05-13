@@ -31,4 +31,10 @@ public class Participation {
 
     @Column(name = "participated_at", nullable = false)
     private LocalDateTime participatedAt;
+
+    public Participation(Member member, Post post) {
+        this.member = member;
+        this.post = post;
+        this.participatedAt = LocalDateTime.now();
+    }
 }

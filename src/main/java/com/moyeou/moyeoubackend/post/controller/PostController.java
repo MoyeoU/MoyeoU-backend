@@ -31,4 +31,10 @@ public class PostController {
     public void delete(@PathVariable Long postId, @LoginMember Long memberId) {
         postService.delete(postId, memberId);
     }
+
+    @PostMapping("/posts/{postId}/attend")
+    public ResponseEntity<Void> attend(@PathVariable Long postId, @LoginMember Long memberId) {
+        Long participationId = postService.attend(postId, memberId);
+        return ResponseEntity.created(URI.create(String.format("/posts/%d/participations/%d", postId, participationId))).build();
+    }
 }
