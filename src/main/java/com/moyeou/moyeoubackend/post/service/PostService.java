@@ -6,6 +6,7 @@ import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
+import com.moyeou.moyeoubackend.post.domain.Participation;
 import com.moyeou.moyeoubackend.post.domain.Post;
 import com.moyeou.moyeoubackend.post.domain.PostHashtag;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
@@ -56,6 +57,15 @@ public class PostService {
             throw new UnAuthorizedException("작성자만 삭제할 수 있습니다.");
         }
         postRepository.deleteById(post.getId());
+    }
+
+    @Transactional
+    public Long attend(Long postId, Long memberId) {
+        Member member = findByMemberId(memberId);
+        Post post = findByPostId(postId);
+        Participation participation = post.attend(member);
+        postRepository.flush();
+        return participation.getId();
     }
 
     private Member findByMemberId(Long memberId) {

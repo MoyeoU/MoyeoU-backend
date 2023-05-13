@@ -82,4 +82,17 @@ public class Post {
     public boolean isHost(Member member) {
         return host.equals(member);
     }
+
+    public Participation attend(Member member) {
+        if (isHost(member)) {
+            throw new IllegalStateException("작성자는 신청할 수 없습니다.");
+        }
+        if (currentCount >= headCount) {
+            throw new IllegalStateException("모집 정원이 초과되었습니다.");
+        }
+        Participation participation = new Participation(member, this);
+        participations.add(participation);
+        currentCount++;
+        return participation;
+    }
 }

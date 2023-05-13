@@ -13,8 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.moyeou.moyeoubackend.common.exception.ErrorCode.ENTITY_NOT_FOUND;
-import static com.moyeou.moyeoubackend.common.exception.ErrorCode.INVALID_REQUEST_PARAMS;
+import static com.moyeou.moyeoubackend.common.exception.ErrorCode.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -34,6 +33,14 @@ public class GlobalExceptionHandler {
         log.warn("[{}|{}] resultCode: {}, resultMessage: {}",
                 request.getRequestURI(), request.getMethod(), response.getCode(), response.getMessage());
         return new ResponseEntity<>(response, ENTITY_NOT_FOUND.getStatus());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException exception, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(ILLEGAL_STATE.getCode(), exception.getMessage());
+        log.warn("[{}|{}] resultCode: {}, resultMessage: {}",
+                request.getRequestURI(), request.getMethod(), response.getCode(), response.getMessage());
+        return new ResponseEntity<>(response, ILLEGAL_STATE.getStatus());
     }
 
     @ExceptionHandler(MoyeouException.class)
