@@ -3,6 +3,7 @@ package com.moyeou.moyeoubackend.post.acceptance;
 import com.moyeou.moyeoubackend.AcceptanceTest;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
+import com.moyeou.moyeoubackend.common.exception.ErrorResponse;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
@@ -38,35 +39,14 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @Test
     void createAndFind() throws Exception {
         // member1, member2 회원가입, 로그인
-        String member1 = signUpLogin("example@o.cnu.ac.kr", "pw");
-        String member2 = signUpLogin("ex@o.cnu.ac.kr", "password");
+        var member1 = signUpLogin("example@o.cnu.ac.kr", "pw");
+        var member2 = signUpLogin("ex@o.cnu.ac.kr", "password");
 
         // member1 : 게시물 생성
-        var post = CreateRequest.builder()
-                .title("JPA 스터디")
-                .headCount(4)
-                .operationWay("대면")
-                .expectedDate("06-01")
-                .estimatedDuration("3개월")
-                .content("<h1>같이 공부해요!</h1>")
-                .hashtags(Arrays.asList("Java", "JPA", "Spring"))
-                .build();
-        String location = mockMvc.perform(post("/posts")
-                        .header("Authorization", "Bearer " + member1)
-                        .content(objectMapper.writeValueAsString(post))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getHeader("location");
+        var location = createPost(member1);
 
         // member2 : 게시물 조회
-        String response = mockMvc.perform(get(location)
-                        .header("Authorization", "Bearer " + member2))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString(UTF_8);
+        var response = findPost(location, member2);
 
         PostResponse postResponse = objectMapper.readValue(response, PostResponse.class);
         assertAll(
@@ -75,6 +55,51 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(postResponse.getIsHost()).isFalse(),
                 () -> assertThat(postResponse.getHashtags()).containsExactly("Java", "JPA", "Spring")
         );
+    }
+
+    @DisplayName("스터디에 참여한다.")
+    @Test
+    void attend() throws Exception {
+        var host = signUpLogin("example@o.cnu.ac.kr", "pw");
+        var member = signUpLogin("ex@o.cnu.ac.kr", "password");
+
+        // host가 게시물 생성
+        var post = createPost(host);
+
+        // member가 신청
+        var location = mockMvc.perform(post(post + "/attend")
+                        .header("Authorization", "Bearer " + member))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getHeader("location");
+
+        // 조회
+        var response = findPost(member, post);
+
+        PostResponse postResponse = objectMapper.readValue(response, PostResponse.class);
+        assertThat(location).startsWith(post + "/participations/");
+        assertThat(postResponse.getCurrentCount()).isEqualTo(2);
+    }
+
+    @DisplayName("작성자가 스터디에 참여한다.")
+    @Test
+    void attendByHost() throws Exception {
+        var host = signUpLogin("example@o.cnu.ac.kr", "pw");
+
+        // host가 게시물 생성
+        var post = createPost(host);
+
+        // host가 신청
+        var response = mockMvc.perform(post(post + "/attend")
+                        .header("Authorization", "Bearer " + host))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(UTF_8);
+
+        ErrorResponse errorResponse = objectMapper.readValue(response, ErrorResponse.class);
+        assertThat(errorResponse.getCode()).isEqualTo("4007");
     }
 
     private String signUpLogin(String email, String password) throws Exception {
@@ -100,5 +125,34 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
         LoginResponse loginResponse = objectMapper.readValue(response, LoginResponse.class);
         return loginResponse.getAccessToken();
+    }
+
+    private String createPost(String token) throws Exception {
+        var post = CreateRequest.builder()
+                .title("JPA 스터디")
+                .headCount(4)
+                .operationWay("대면")
+                .expectedDate("06-01")
+                .estimatedDuration("3개월")
+                .content("<h1>같이 공부해요!</h1>")
+                .hashtags(Arrays.asList("Java", "JPA", "Spring"))
+                .build();
+        return mockMvc.perform(post("/posts")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(post))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getHeader("location");
+    }
+
+    private String findPost(String token, String location) throws Exception {
+        return mockMvc.perform(get(location)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(UTF_8);
     }
 }
