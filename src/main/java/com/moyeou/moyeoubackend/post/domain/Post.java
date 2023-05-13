@@ -95,4 +95,16 @@ public class Post {
         currentCount++;
         return participation;
     }
+
+    public void cancel(Member member) {
+        if (isHost(member)) {
+            throw new IllegalStateException("작성자는 취소할 수 없습니다.");
+        }
+        Participation participation = participations.stream()
+                .filter(p -> p.isMatch(member))
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("신청한 회원만 취소할 수 있습니다."));
+        participations.remove(participation);
+        currentCount--;
+    }
 }

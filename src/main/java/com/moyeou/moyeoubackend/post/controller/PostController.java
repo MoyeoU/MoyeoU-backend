@@ -37,4 +37,9 @@ public class PostController {
         Long participationId = postService.attend(postId, memberId);
         return ResponseEntity.created(URI.create(String.format("/posts/%d/participations/%d", postId, participationId))).build();
     }
+
+    @PostMapping("/posts/{postId}/cancel")
+    public void cancel(@PathVariable Long postId, @LoginMember Long memberId) {
+        postService.cancel(postId, memberId);
+    }
 }
