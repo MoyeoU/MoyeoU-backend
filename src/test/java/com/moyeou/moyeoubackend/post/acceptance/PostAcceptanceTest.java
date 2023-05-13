@@ -43,14 +43,14 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var member2 = signUpLogin("ex@o.cnu.ac.kr", "password");
 
         // member1 : 게시물 생성
-        var location = createPost(member1);
+        var post = createPost(member1);
 
         // member2 : 게시물 조회
-        var response = findPost(location, member2);
+        var response = findPost(member2, post);
 
         PostResponse postResponse = objectMapper.readValue(response, PostResponse.class);
         assertAll(
-                () -> assertThat(location).startsWith("/posts/"),
+                () -> assertThat(post).startsWith("/posts/"),
                 () -> assertThat(postResponse.getContent()).isEqualTo("<h1>같이 공부해요!</h1>"),
                 () -> assertThat(postResponse.getIsHost()).isFalse(),
                 () -> assertThat(postResponse.getHashtags()).containsExactly("Java", "JPA", "Spring")
