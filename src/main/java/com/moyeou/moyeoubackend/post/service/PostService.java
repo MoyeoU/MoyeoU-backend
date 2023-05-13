@@ -68,6 +68,13 @@ public class PostService {
         return participation.getId();
     }
 
+    @Transactional
+    public void cancel(Long postId, Long memberId) {
+        Member member = findByMemberId(memberId);
+        Post post = findByPostId(postId);
+        post.cancel(member);
+    }
+
     private Member findByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("회원(memberId: " + memberId + ")이 존재하지 않습니다."));

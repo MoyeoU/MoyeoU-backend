@@ -1,7 +1,6 @@
 package com.moyeou.moyeoubackend.post.domain;
 
 import com.moyeou.moyeoubackend.member.domain.Member;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 
 import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PostTest {
@@ -51,9 +51,50 @@ public class PostTest {
         post.attend(member1);
         post.attend(member2);
 
-        Assertions.assertThatThrownBy(
-                () -> post.attend(member3)
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> post.attend(member3))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("모집 정원이 초과되었습니다.");
+    }
+
+    @DisplayName("신청을 취소한다")
+    @Test
+    void 신청_취소() {
+        var host = createMember("host@o.cnu.ac.kr");
+        var member1 = createMember("member1@o.cnu.ac.kr");
+        var member2 = createMember("member2@o.cnu.ac.kr");
+
+        var post = createPost(host, 3);
+        post.attend(member1);
+        post.attend(member2);
+
+        // member2 신청 취소
+        post.cancel(member2);
+
+        List<String> emails = post.getParticipations().stream()
+                .map(Participation::getMember)
+                .map(Member::getEmail)
+                .collect(Collectors.toList());
+
+        assertAll(
+                () -> assertThat(emails).containsOnly("member1@o.cnu.ac.kr"),
+                () -> assertThat(post.getCurrentCount()).isEqualTo(2),
+                () -> assertThat(post.getParticipations().size()).isEqualTo(1)
+        );
+    }
+
+    @DisplayName("신청하지 않은 사람이 취소한다")
+    @Test
+    void 신청하지_않은_사람_취소() {
+        var host = createMember("host@o.cnu.ac.kr");
+        var member1 = createMember("member1@o.cnu.ac.kr");
+        var member2 = createMember("member2@o.cnu.ac.kr");
+
+        var post = createPost(host, 3);
+        post.attend(member1);
+
+        assertThatThrownBy(() -> post.cancel(member2))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("신청한 회원만 취소할 수 있습니다.");
     }
 
     private Member createMember(String email) {

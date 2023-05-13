@@ -37,4 +37,8 @@ public class Participation {
         this.post = post;
         this.participatedAt = LocalDateTime.now();
     }
+
+    public boolean isMatch(Member member) {
+        return this.member.equals(member);
+    }
 }
