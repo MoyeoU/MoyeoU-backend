@@ -22,7 +22,10 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     void login() throws Exception {
         signUp("example@o.cnu.ac.kr", "pw");
         postApiCall("/login", new LoginRequest("example@o.cnu.ac.kr", "pw"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.refreshToken").exists())
+                .andExpect(jsonPath("$.nickname").exists());
     }
 
     @DisplayName("가입하지 않은 사람이 로그인한다")

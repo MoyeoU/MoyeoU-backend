@@ -75,12 +75,23 @@ public class Post {
         this.postHashtags = postHashtags;
     }
 
-    public void addPostHashtag(List<PostHashtag> postHashtags) {
+    public void setPostHashtag(List<PostHashtag> postHashtags) {
         this.postHashtags = postHashtags;
     }
 
     public boolean isHost(Member member) {
         return host.equals(member);
+    }
+
+    public void update(String title, Integer headCount, String operationWay, String expectedDate,
+                       String estimatedDuration, String content, List<PostHashtag> postHashtags) {
+        this.title = title;
+        this.headCount = headCount;
+        this.operationWay = operationWay;
+        this.expectedDate = expectedDate;
+        this.estimatedDuration = estimatedDuration;
+        this.content = content;
+        this.postHashtags = postHashtags;
     }
 
     public Participation attend(Member member) {
