@@ -2,6 +2,7 @@ package com.moyeou.moyeoubackend.post.controller;
 
 import com.moyeou.moyeoubackend.auth.supports.LoginMember;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
+import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,11 @@ public class PostController {
     @GetMapping("/posts/{postId}")
     public PostResponse find(@PathVariable Long postId, @LoginMember Long memberId) {
         return postService.find(postId, memberId);
+    }
+
+    @PutMapping("/posts/{postId}")
+    public void update(@PathVariable Long postId, @LoginMember Long memberId, @Valid @RequestBody UpdateRequest request) {
+        postService.update(postId, memberId, request);
     }
 
     @DeleteMapping("/posts/{postId}")
