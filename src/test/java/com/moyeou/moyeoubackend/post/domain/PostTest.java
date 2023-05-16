@@ -64,6 +64,7 @@ public class PostTest {
         var member2 = createMember("member2@o.cnu.ac.kr");
 
         var post = createPost(host, 3);
+        post.addParticipation(host);
         post.attend(member1);
         post.attend(member2);
 
@@ -76,9 +77,9 @@ public class PostTest {
                 .collect(Collectors.toList());
 
         assertAll(
-                () -> assertThat(emails).containsOnly("member1@o.cnu.ac.kr"),
+                () -> assertThat(emails).containsOnly("host@o.cnu.ac.kr", "member1@o.cnu.ac.kr"),
                 () -> assertThat(post.getCurrentCount()).isEqualTo(2),
-                () -> assertThat(post.getParticipations().size()).isEqualTo(1)
+                () -> assertThat(post.getParticipations().size()).isEqualTo(2)
         );
     }
 
@@ -90,6 +91,7 @@ public class PostTest {
         var member2 = createMember("member2@o.cnu.ac.kr");
 
         var post = createPost(host, 3);
+        post.addParticipation(host);
         post.attend(member1);
 
         assertThatThrownBy(() -> post.cancel(member2))

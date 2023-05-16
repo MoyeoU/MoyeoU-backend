@@ -48,4 +48,14 @@ public class PostController {
     public void cancel(@PathVariable Long postId, @LoginMember Long memberId) {
         postService.cancel(postId, memberId);
     }
+
+    @PostMapping("/posts/{postId}/complete")
+    public void complete(@PathVariable Long postId, @LoginMember Long memberId) {
+        postService.complete(postId, memberId);
+    }
+
+    @PostMapping("/posts/{postId}/end")
+    public void end(@PathVariable Long postId, @LoginMember Long memberId) {
+        postService.end(postId, memberId);
+    }
 }

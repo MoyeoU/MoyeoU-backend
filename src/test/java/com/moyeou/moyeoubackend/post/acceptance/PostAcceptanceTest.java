@@ -4,6 +4,7 @@ import com.moyeou.moyeoubackend.AcceptanceTest;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
 import com.moyeou.moyeoubackend.common.exception.ErrorResponse;
+import com.moyeou.moyeoubackend.evaluation.repository.EvaluationRepository;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
@@ -27,6 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PostAcceptanceTest extends AcceptanceTest {
     @Autowired
     private HashtagRepository hashtagRepository;
+
+    @Autowired
+    private EvaluationRepository evaluationRepository;
 
     @BeforeEach
     void setUp() {
@@ -100,6 +104,30 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
         ErrorResponse errorResponse = objectMapper.readValue(response, ErrorResponse.class);
         assertThat(errorResponse.getCode()).isEqualTo("4007");
+    }
+
+    @DisplayName("작성자가 스터디를 종료한다.")
+    @Test
+    void endByHost() throws Exception {
+        var host = signUpLogin("example@o.cnu.ac.kr", "pw");
+        var member1 = signUpLogin("member1@o.cnu.ac.kr", "password");
+        var member2 = signUpLogin("member2@o.cnu.ac.kr", "password");
+
+        var post = createPost(host);
+
+        mockMvc.perform(post(post + "/attend")
+                .header("Authorization", "Bearer " + member1));
+        mockMvc.perform(post(post + "/attend")
+                .header("Authorization", "Bearer " + member2));
+
+        // 스터디 종료
+        mockMvc.perform(post(post + "/end")
+                        .header("Authorization", "Bearer " + host))
+                .andExpect(status().isOk());
+
+        // (1->2), (1->3), (2->1), (2->3), (3->1), (3->2)
+        // 나중에 테스트 수정
+        assertThat(evaluationRepository.findAll().size()).isEqualTo(6);
     }
 
     private String signUpLogin(String email, String password) throws Exception {

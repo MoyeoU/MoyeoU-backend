@@ -5,6 +5,7 @@ import com.moyeou.moyeoubackend.post.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -16,6 +17,7 @@ import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class CreateRequest {
     @NotEmpty(message = "제목을 입력해주세요")
