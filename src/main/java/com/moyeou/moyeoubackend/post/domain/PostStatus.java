@@ -1,5 +1,5 @@
 package com.moyeou.moyeoubackend.post.domain;
 
 public enum PostStatus {
-    PROGRESS, COMPLETED, TERMINATED
+    PROGRESS, COMPLETED, END
 }
