@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.post.domain;
 
+import com.moyeou.moyeoubackend.evaluation.domain.Evaluation;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +11,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.moyeou.moyeoubackend.post.domain.PostStatus.*;
+import static com.moyeou.moyeoubackend.post.domain.PostStatus.COMPLETED;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -60,6 +63,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     private List<PostHashtag> postHashtags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
+    private List<Evaluation> evaluations = new ArrayList<>();
+
     @Builder
     public Post(String title, Integer headCount, Integer currentCount, String operationWay, String expectedDate,
                 String estimatedDuration, String content, PostStatus status, Member host, List<PostHashtag> postHashtags) {
@@ -77,6 +83,10 @@ public class Post {
 
     public void setPostHashtag(List<PostHashtag> postHashtags) {
         this.postHashtags = postHashtags;
+    }
+
+    public void addParticipation(Member host) {
+        this.participations.add(new Participation(host, this));
     }
 
     public boolean isHost(Member member) {
@@ -117,5 +127,21 @@ public class Post {
                 .orElseThrow(() -> new IllegalStateException("신청한 회원만 취소할 수 있습니다."));
         participations.remove(participation);
         currentCount--;
+    }
+
+    public void complete() {
+        changeStatus(COMPLETED);
+    }
+
+    public void end() {
+        changeStatus(END);
+    }
+
+    public void changeStatus(PostStatus status) {
+        this.status = status;
+    }
+
+    public void assignEvaluations(List<Evaluation> evaluations) {
+        this.evaluations = evaluations;
     }
 }
