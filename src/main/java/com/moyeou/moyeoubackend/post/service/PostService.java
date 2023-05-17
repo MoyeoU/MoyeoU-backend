@@ -9,7 +9,6 @@ import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.domain.*;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
 import com.moyeou.moyeoubackend.post.repository.PostRepository;
-import com.moyeou.moyeoubackend.evaluation.domain.Evaluation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,19 +99,6 @@ public class PostService {
             throw new UnAuthorizedException("작성자만 종료할 수 있습니다.");
         }
         post.end();
-
-        List<Participation> participations = post.getParticipations();
-        List<Evaluation> evaluations = post.getEvaluations();
-        for (int i = 0; i < participations.size(); i++) {
-            for (int j = 0; j < participations.size(); j++) {
-                if (i == j) continue;
-                Member evaluator = participations.get(i).getMember();
-                Member evaluatee = participations.get(j).getMember();
-                Evaluation evaluation = new Evaluation(evaluator, evaluatee, post);
-                evaluations.add(evaluation);
-            }
-        }
-        post.assignEvaluations(evaluations);
     }
 
     private Member findByMemberId(Long memberId) {

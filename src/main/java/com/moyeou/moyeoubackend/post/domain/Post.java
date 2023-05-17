@@ -130,18 +130,23 @@ public class Post {
     }
 
     public void complete() {
-        changeStatus(COMPLETED);
+        this.status = COMPLETED;
     }
 
     public void end() {
-        changeStatus(END);
+        generateEvaluations();
+        this.status = END;
     }
 
-    public void changeStatus(PostStatus status) {
-        this.status = status;
-    }
-
-    public void assignEvaluations(List<Evaluation> evaluations) {
-        this.evaluations = evaluations;
+    private void generateEvaluations() {
+        for (int i = 0; i < participations.size(); i++) {
+            for (int j = 0; j < participations.size(); j++) {
+                if (i == j) continue;
+                Member evaluator = participations.get(i).getMember();
+                Member evaluatee = participations.get(j).getMember();
+                Evaluation evaluation = new Evaluation(evaluator, evaluatee, this);
+                evaluations.add(evaluation);
+            }
+        }
     }
 }
