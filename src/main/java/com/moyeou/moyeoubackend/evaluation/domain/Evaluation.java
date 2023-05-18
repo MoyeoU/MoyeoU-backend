@@ -38,9 +38,13 @@ public class Evaluation {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "evaluated")
+    private Boolean evaluated;
+
     public Evaluation(Member evaluator, Member evaluatee, Post post) {
         this.evaluator = evaluator;
         this.evaluatee = evaluatee;
         this.post = post;
+        this.evaluated = false;
     }
 }
