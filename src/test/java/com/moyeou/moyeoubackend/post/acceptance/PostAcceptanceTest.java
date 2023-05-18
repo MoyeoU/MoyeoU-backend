@@ -7,7 +7,7 @@ import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class PostAcceptanceTest extends AcceptanceTest {
     @Autowired
-    private static HashtagRepository hashtagRepository;
+    private HashtagRepository hashtagRepository;
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         hashtagRepository.save(new Hashtag("Java"));
         hashtagRepository.save(new Hashtag("JPA"));
         hashtagRepository.save(new Hashtag("Spring"));
