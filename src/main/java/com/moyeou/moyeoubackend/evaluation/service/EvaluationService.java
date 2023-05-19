@@ -29,7 +29,7 @@ public class EvaluationService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         return post.getEvaluations().stream()
-                .filter(Evaluation -> Evaluation.getEvaluator().equals(member))
+                .filter(evaluation -> evaluation.isEvaluator(member))
                 .map(EvaluateeResponse::from)
                 .collect(Collectors.toList());
     }

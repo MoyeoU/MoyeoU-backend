@@ -53,4 +53,8 @@ public class Evaluation {
         this.content = content;
         this.evaluated = true;
     }
+
+    public boolean isEvaluator(Member member) {
+        return this.evaluator.equals(member);
+    }
 }
