@@ -47,4 +47,14 @@ public class Evaluation {
         this.post = post;
         this.evaluated = false;
     }
+
+    public void evaluate(Double point, String content) {
+        this.point = point;
+        this.content = content;
+        this.evaluated = true;
+    }
+
+    public boolean isEvaluator(Member member) {
+        return this.evaluator.equals(member);
+    }
 }
