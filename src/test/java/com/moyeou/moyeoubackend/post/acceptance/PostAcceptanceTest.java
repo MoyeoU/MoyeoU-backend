@@ -4,9 +4,13 @@ import com.jayway.jsonpath.JsonPath;
 import com.moyeou.moyeoubackend.AcceptanceTest;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
+import com.moyeou.moyeoubackend.post.controller.request.AnswerRequest;
+import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
+import com.moyeou.moyeoubackend.post.domain.Item;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
+import com.moyeou.moyeoubackend.post.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
+import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import static com.moyeou.moyeoubackend.TestUtils.id;
+import static com.moyeou.moyeoubackend.TestUtils.uri;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,6 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PostAcceptanceTest extends AcceptanceTest {
     @Autowired
     private HashtagRepository hashtagRepository;
+    @Autowired
+    private PostRepository postRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
@@ -59,17 +72,16 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var member = signUpLogin("ex@o.cnu.ac.kr", "password");
 
         // host가 게시물 생성
-        var post = createPost(host)
-                .andReturn().getResponse().getHeader("Location");
+        var response = createPost(host);
+        var postUri = uri(response);
 
         // member가 신청
-        mockMvc.perform(post(post + "/attend")
-                        .header("Authorization", "Bearer " + member))
+        attend(postUri, member)
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", startsWith(post + "/participations/")));
+                .andExpect(header().string("Location", startsWith(postUri + "/participations/")));
 
         // 현재 참여 인원 : 2
-        findPost(member, post)
+        findPost(member, postUri)
                 .andExpect(jsonPath("$.currentCount").value(2));
     }
 
@@ -79,12 +91,11 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var host = signUpLogin("example@o.cnu.ac.kr", "pw");
 
         // host가 게시물 생성
-        var post = createPost(host)
-                .andReturn().getResponse().getHeader("Location");
+        var response = createPost(host);
+        var postUri = uri(response);
 
         // host가 신청 -> exception
-        mockMvc.perform(post(post + "/attend")
-                        .header("Authorization", "Bearer " + host))
+        attend(postUri, host)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("4007"));
     }
@@ -96,21 +107,19 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var member1 = signUpLogin("member1@o.cnu.ac.kr", "password");
         var member2 = signUpLogin("member2@o.cnu.ac.kr", "password");
 
-        var post = createPost(host)
-                .andReturn().getResponse().getHeader("Location");
+        var response = createPost(host);
+        var postUri = uri(response);
 
-        mockMvc.perform(post(post + "/attend")
-                .header("Authorization", "Bearer " + member1));
-        mockMvc.perform(post(post + "/attend")
-                .header("Authorization", "Bearer " + member2));
+        attend(postUri, member1);
+        attend(postUri, member2);
 
         // 스터디 종료
-        mockMvc.perform(post(post + "/end")
+        mockMvc.perform(post(postUri + "/end")
                         .header("Authorization", "Bearer " + host))
                 .andExpect(status().isOk());
 
         // 평가해야 할 스터디원 목록 조회
-        mockMvc.perform(get(post + "/evaluations")
+        mockMvc.perform(get(postUri + "/evaluations")
                         .header("Authorization", "Bearer " + member1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -150,6 +159,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .estimatedDuration("3개월")
                 .content("<h1>같이 공부해요!</h1>")
                 .hashtags(Arrays.asList("Java", "JPA", "Spring"))
+                .items(Arrays.asList("나이", "성별", "거주지"))
                 .build();
         return mockMvc.perform(post("/posts")
                         .header("Authorization", "Bearer " + token)
@@ -161,5 +171,25 @@ public class PostAcceptanceTest extends AcceptanceTest {
         return mockMvc.perform(get(location)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
+    }
+
+    private Object createAttendRequest(Long postId) {
+        List<AnswerRequest> answers = new ArrayList<>();
+        entityManager.flush();
+        entityManager.clear();
+        var post = postRepository.findById(postId).get();
+        for (Item item : post.getItems()) {
+            AnswerRequest answerRequest = new AnswerRequest(item.getId(), "대전");
+            answers.add(answerRequest);
+        }
+        return new AttendRequest(answers);
+    }
+
+    private ResultActions attend(String uri, String token) throws Exception {
+        Long postId = id(uri);
+        return mockMvc.perform(post(uri + "/attend")
+                .header("Authorization", "Bearer " + token)
+                .content(objectMapper.writeValueAsString(createAttendRequest(postId)))
+                .contentType(MediaType.APPLICATION_JSON));
     }
 }

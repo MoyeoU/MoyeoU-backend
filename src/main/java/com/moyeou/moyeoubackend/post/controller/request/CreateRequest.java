@@ -41,6 +41,8 @@ public class CreateRequest {
 
     private List<String> hashtags;
 
+    private List<String> items;
+
     public Post toEntity(Member host) {
         return Post.builder()
                 .title(title)
@@ -53,6 +55,7 @@ public class CreateRequest {
                 .status(PROGRESS)
                 .host(host)
                 .postHashtags(new ArrayList<>())
+                .items(new ArrayList<>())
                 .build();
     }
 }

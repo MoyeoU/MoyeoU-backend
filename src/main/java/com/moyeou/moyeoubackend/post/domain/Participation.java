@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -32,10 +34,17 @@ public class Participation {
     @Column(name = "participated_at", nullable = false)
     private LocalDateTime participatedAt;
 
+    @OneToMany(mappedBy = "participation", cascade = CascadeType.ALL)
+    private List<Answer> answers = new ArrayList<>();
+
     public Participation(Member member, Post post) {
         this.member = member;
         this.post = post;
         this.participatedAt = LocalDateTime.now();
+    }
+
+    public void addAnswers(List<Answer> answers) {
+        this.answers.addAll(answers);
     }
 
     public boolean isMatch(Member member) {

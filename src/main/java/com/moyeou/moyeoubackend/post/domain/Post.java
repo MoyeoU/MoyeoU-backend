@@ -66,9 +66,12 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     private List<Evaluation> evaluations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
+    private List<Item> items = new ArrayList<>();
+
     @Builder
     public Post(String title, Integer headCount, Integer currentCount, String operationWay, String expectedDate,
-                String estimatedDuration, String content, PostStatus status, Member host, List<PostHashtag> postHashtags) {
+                String estimatedDuration, String content, PostStatus status, Member host, List<PostHashtag> postHashtags, List<Item> items) {
         this.title = title;
         this.headCount = headCount;
         this.currentCount = currentCount;
@@ -79,14 +82,19 @@ public class Post {
         this.status = status;
         this.host = host;
         this.postHashtags = postHashtags;
+        this.items = items;
     }
 
     public void setPostHashtag(List<PostHashtag> postHashtags) {
-        this.postHashtags = postHashtags;
+        this.postHashtags.addAll(postHashtags);
     }
 
     public void addParticipation(Member host) {
         this.participations.add(new Participation(host, this));
+    }
+
+    public void addItem(List<Item> items) {
+        this.items.addAll(items);
     }
 
     public boolean isHost(Member member) {
