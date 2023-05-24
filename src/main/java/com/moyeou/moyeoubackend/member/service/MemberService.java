@@ -5,14 +5,26 @@ import com.moyeou.moyeoubackend.member.controller.request.UpdateRequest;
 import com.moyeou.moyeoubackend.file.service.FileSystemStorageService;
 import com.moyeou.moyeoubackend.member.controller.response.MemberResponse;
 import com.moyeou.moyeoubackend.member.domain.Member;
+import com.moyeou.moyeoubackend.member.domain.MemberHashtag;
 import com.moyeou.moyeoubackend.member.exception.DuplicateMemberException;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
+import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
+import com.moyeou.moyeoubackend.post.domain.Hashtag;
+import com.moyeou.moyeoubackend.post.domain.Participation;
+import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
+import com.moyeou.moyeoubackend.post.repository.ParticipationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.moyeou.moyeoubackend.post.domain.PostStatus.COMPLETED;
+import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,6 +33,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileSystemStorageService fileUploader;
+    private final HashtagRepository hashtagRepository;
+    private final ParticipationRepository participationRepository;
 
     @Transactional
     public Long save(SignUpRequest request) {
@@ -33,14 +47,26 @@ public class MemberService {
 
     public MemberResponse find(Long memberId) {
         Member member = findById(memberId);
-        return MemberResponse.from(member);
+        List<PostResponse> memberParticipations = participationRepository.findAllByMemberId(memberId).stream()
+                .map(Participation::getPost)
+                .filter(post -> post.getStatus() == PROGRESS || post.getStatus() == COMPLETED)
+                .map(post -> PostResponse.from(post, post.isHost(member)))
+                .collect(Collectors.toList());
+        return MemberResponse.from(member, memberParticipations);
     }
 
     @Transactional
     public void update(Long memberId, UpdateRequest request) {
         Member member = findById(memberId);
         String path = fileUploader.upload(request.getFile());
-        member.update(request.getIntroduction(), request.getNickname(), path);
+        List<String> hashtags = request.getHashtags();
+        List<MemberHashtag> memberHashtags = new ArrayList<>();
+        for (String name : hashtags) {
+            Hashtag hashtag = hashtagRepository.findByName(name)
+                    .orElseThrow(() -> new EntityNotFoundException("해시태그가 존재하지 않습니다."));
+            memberHashtags.add(new MemberHashtag(member, hashtag));
+        }
+        member.update(request.getIntroduction(), request.getNickname(), path, memberHashtags);
     }
 
     @Transactional
