@@ -1,6 +1,6 @@
-package com.moyeou.moyeoubackend.post.domain;
+package com.moyeou.moyeoubackend.member.domain;
 
-import com.moyeou.moyeoubackend.member.domain.Member;
+import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +26,9 @@ public class MemberHashtag {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hashtag_id")
     private Hashtag hashtag;
+
+    public MemberHashtag(Member member, Hashtag hashtag) {
+        this.member = member;
+        this.hashtag = hashtag;
+    }
 }

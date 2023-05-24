@@ -8,8 +8,4 @@ public class DuplicateMemberException extends MoyeouException {
     public DuplicateMemberException() {
         super(DUPLICATE_MEMBER);
     }
-
-    public DuplicateMemberException(String message) {
-        super(DUPLICATE_MEMBER.getCode(), message, DUPLICATE_MEMBER.getStatus());
-    }
 }
