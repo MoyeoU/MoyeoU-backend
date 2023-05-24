@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -41,6 +45,9 @@ public class Member {
     @Column(name = "point")
     private Double point;
 
+    @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
+    private List<MemberHashtag> memberHashtags = new ArrayList<>();
+
     @Builder
     public Member(String email, String department, Integer studentNumber, String nickname, String password) {
         this.email = email;
@@ -50,9 +57,10 @@ public class Member {
         this.password = password;
     }
 
-    public void update(String introduction, String nickname, String imagePath) {
+    public void update(String introduction, String nickname, String imagePath, List<MemberHashtag> memberHashtags) {
         this.introduction = introduction;
         this.nickname = nickname;
         this.imagePath = imagePath;
+        this.memberHashtags.addAll(memberHashtags);
     }
 }

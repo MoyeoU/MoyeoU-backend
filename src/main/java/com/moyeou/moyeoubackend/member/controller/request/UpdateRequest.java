@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -16,4 +17,6 @@ public class UpdateRequest {
     private String nickname;
 
     private MultipartFile file;
+
+    private List<String> hashtags;
 }
