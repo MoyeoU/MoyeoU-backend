@@ -3,6 +3,7 @@ package com.moyeou.moyeoubackend.post.domain;
 import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.evaluation.domain.Evaluation;
 import com.moyeou.moyeoubackend.member.domain.Member;
+import com.moyeou.moyeoubackend.post.exception.NonExistentItemException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -76,7 +77,7 @@ public class Post {
     public Post(String title, Integer headCount, String operationWay, String expectedDate,
                 String estimatedDuration, String content, Member host, List<String> items) {
         if (items == null) {
-            throw new RuntimeException("신청폼 항목이 존재하지 않습니다.");
+            throw new NonExistentItemException();
         }
         this.title = title;
         this.headCount = headCount;

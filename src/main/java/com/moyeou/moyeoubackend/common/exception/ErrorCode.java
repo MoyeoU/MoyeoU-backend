@@ -23,6 +23,8 @@ public enum ErrorCode {
 
     ILLEGAL_STATE("4007", "IllegalStateException", HttpStatus.BAD_REQUEST),
 
+    NON_EXISTENT_ITEM("4008", "신청폼 항목이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+
     STORAGE_EXCEPTION("5000", "저장소 예외", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;
