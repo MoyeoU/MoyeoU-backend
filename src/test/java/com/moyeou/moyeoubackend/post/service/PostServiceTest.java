@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -83,14 +82,12 @@ public class PostServiceTest {
         return postRepository.save(Post.builder()
                 .title("JPA 스터디")
                 .headCount(3)
-                .currentCount(1)
                 .operationWay("대면")
                 .expectedDate("06-01")
                 .estimatedDuration("3개월")
                 .content("<h1>같이 공부해요!</h1>")
-                .status(PROGRESS)
                 .host(host)
-                .postHashtags(new ArrayList<>())
+                .items(new ArrayList<>())
                 .build());
     }
 }

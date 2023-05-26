@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,9 +31,9 @@ public class PostTest {
                 .collect(Collectors.toList());
 
         assertAll(
-                () -> assertThat(emails).containsExactly("member1@o.cnu.ac.kr", "member2@o.cnu.ac.kr"),
+                () -> assertThat(emails).containsExactly("host@o.cnu.ac.kr", "member1@o.cnu.ac.kr", "member2@o.cnu.ac.kr"),
                 () -> assertThat(post.getCurrentCount()).isEqualTo(3),
-                () -> assertThat(post.getParticipations().size()).isEqualTo(2)
+                () -> assertThat(post.getParticipations().size()).isEqualTo(3)
         );
     }
 
@@ -64,7 +63,6 @@ public class PostTest {
         var member2 = createMember("member2@o.cnu.ac.kr");
 
         var post = createPost(host, 3);
-        post.addParticipation(host);
         post.attend(member1);
         post.attend(member2);
 
@@ -91,7 +89,6 @@ public class PostTest {
         var member2 = createMember("member2@o.cnu.ac.kr");
 
         var post = createPost(host, 3);
-        post.addParticipation(host);
         post.attend(member1);
 
         assertThatThrownBy(() -> post.cancel(member2))
@@ -106,14 +103,12 @@ public class PostTest {
         return Post.builder()
                 .title("JPA 스터디")
                 .headCount(headCount)
-                .currentCount(1)
                 .operationWay("대면")
                 .expectedDate("06-01")
                 .estimatedDuration("3개월")
                 .content("<h1>같이 공부해요!</h1>")
-                .status(PROGRESS)
                 .host(host)
-                .postHashtags(new ArrayList<>())
+                .items(new ArrayList<>())
                 .build();
     }
 }

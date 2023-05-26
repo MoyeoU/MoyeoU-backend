@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
-import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -55,9 +54,9 @@ public class EvaluationServiceTest {
 
     private Post savePost(Member host) {
         return postRepository.save(Post.builder()
-                .title("JPA 스터디").headCount(3).currentCount(1).operationWay("대면")
+                .title("JPA 스터디").headCount(3).operationWay("대면")
                 .expectedDate("06-01").estimatedDuration("3개월").content("<h1>같이 공부해요!</h1>")
-                .status(PROGRESS).host(host).postHashtags(new ArrayList<>())
+                .host(host).items(new ArrayList<>())
                 .build());
     }
 }
