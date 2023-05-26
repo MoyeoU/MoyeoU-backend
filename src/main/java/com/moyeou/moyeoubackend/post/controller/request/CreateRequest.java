@@ -10,10 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
 
 @Getter
 @Builder
@@ -47,15 +44,12 @@ public class CreateRequest {
         return Post.builder()
                 .title(title)
                 .headCount(headCount)
-                .currentCount(1)
                 .operationWay(operationWay)
                 .expectedDate(expectedDate)
                 .estimatedDuration(estimatedDuration)
                 .content(content)
-                .status(PROGRESS)
                 .host(host)
-                .postHashtags(new ArrayList<>())
-                .items(new ArrayList<>())
+                .items(items)
                 .build();
     }
 }
