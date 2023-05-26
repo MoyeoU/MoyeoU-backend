@@ -33,23 +33,14 @@ public class PostService {
         Member host = findByMemberId(memberId);
         Post post = postRepository.save(request.toEntity(host));
         List<PostHashtag> postHashtags = getPostHashtags(request.getHashtags(), post);
-        List<Item> items = new ArrayList<>();
-        for (String name : request.getItems()) {
-            items.add(new Item(post, name));
-        }
-        post.setPostHashtag(postHashtags);
-        post.addItem(items);
-        post.addParticipation(host);
+        post.addPostHashtag(postHashtags);
         return post.getId();
     }
 
     public PostResponse find(Long postId, Long memberId) {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
-        if (post.isHost(member)) {
-            return PostResponse.from(post, true);
-        }
-        return PostResponse.from(post, false);
+        return PostResponse.from(post, post.isHost(member));
     }
 
     @Transactional
@@ -60,8 +51,12 @@ public class PostService {
             throw new UnAuthorizedException("작성자만 삭제할 수 있습니다.");
         }
         List<PostHashtag> postHashtags = getPostHashtags(request.getHashtags(), post);
-        post.update(request.getTitle(), request.getHeadCount(), request.getOperationWay(), request.getExpectedDate(),
-                request.getEstimatedDuration(), request.getContent(), postHashtags);
+        post.update(
+                request.getTitle(), request.getHeadCount(),
+                request.getOperationWay(), request.getExpectedDate(),
+                request.getEstimatedDuration(), request.getContent(),
+                postHashtags
+        );
     }
 
     @Transactional
@@ -103,20 +98,14 @@ public class PostService {
     public void complete(Long postId, Long memberId) {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
-        if (!post.isHost(member)) {
-            throw new UnAuthorizedException("작성자만 모집을 완료할 수 있습니다.");
-        }
-        post.complete();
+        post.complete(member);
     }
 
     @Transactional
     public void end(Long postId, Long memberId) {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
-        if (!post.isHost(member)) {
-            throw new UnAuthorizedException("작성자만 종료할 수 있습니다.");
-        }
-        post.end();
+        post.end(member);
     }
 
     private Member findByMemberId(Long memberId) {

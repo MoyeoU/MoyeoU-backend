@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.post.domain;
 
+import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.evaluation.domain.Evaluation;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.moyeou.moyeoubackend.post.domain.PostStatus.*;
 import static com.moyeou.moyeoubackend.post.domain.PostStatus.COMPLETED;
@@ -24,7 +26,8 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "post")
 @NoArgsConstructor(access = PROTECTED)
 public class Post {
-    @Id @GeneratedValue(strategy = IDENTITY)
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "post_id")
     private Long id;
 
@@ -70,31 +73,30 @@ public class Post {
     private List<Item> items = new ArrayList<>();
 
     @Builder
-    public Post(String title, Integer headCount, Integer currentCount, String operationWay, String expectedDate,
-                String estimatedDuration, String content, PostStatus status, Member host, List<PostHashtag> postHashtags, List<Item> items) {
+    public Post(String title, Integer headCount, String operationWay, String expectedDate,
+                String estimatedDuration, String content, Member host, List<String> items) {
+        if (items == null) {
+            throw new RuntimeException("신청폼 항목이 존재하지 않습니다.");
+        }
         this.title = title;
         this.headCount = headCount;
-        this.currentCount = currentCount;
+        this.currentCount = 1;
         this.operationWay = operationWay;
         this.expectedDate = expectedDate;
         this.estimatedDuration = estimatedDuration;
         this.content = content;
-        this.status = status;
+        this.status = PROGRESS;
         this.host = host;
-        this.postHashtags = postHashtags;
-        this.items = items;
-    }
-
-    public void setPostHashtag(List<PostHashtag> postHashtags) {
-        this.postHashtags.addAll(postHashtags);
-    }
-
-    public void addParticipation(Member host) {
         this.participations.add(new Participation(host, this));
+        this.items.addAll(
+                items.stream()
+                        .map(name -> new Item(this, name))
+                        .collect(Collectors.toList())
+        );
     }
 
-    public void addItem(List<Item> items) {
-        this.items.addAll(items);
+    public void addPostHashtag(List<PostHashtag> postHashtags) {
+        this.postHashtags.addAll(postHashtags);
     }
 
     public boolean isHost(Member member) {
@@ -109,7 +111,12 @@ public class Post {
         this.expectedDate = expectedDate;
         this.estimatedDuration = estimatedDuration;
         this.content = content;
-        this.postHashtags = postHashtags;
+        this.postHashtags.removeIf(postHashtag -> !postHashtags.contains(postHashtag));
+        this.postHashtags.addAll(
+                postHashtags.stream()
+                        .filter(p -> !this.postHashtags.contains(p))
+                        .collect(Collectors.toList())
+        );
     }
 
     public Participation attend(Member member) {
@@ -137,11 +144,17 @@ public class Post {
         currentCount--;
     }
 
-    public void complete() {
+    public void complete(Member member) {
+        if (!isHost(member)) {
+            throw new UnAuthorizedException("작성자만 모집을 완료할 수 있습니다.");
+        }
         this.status = COMPLETED;
     }
 
-    public void end() {
+    public void end(Member member) {
+        if (!isHost(member)) {
+            throw new UnAuthorizedException("작성자만 종료할 수 있습니다.");
+        }
         generateEvaluations();
         this.status = END;
     }
