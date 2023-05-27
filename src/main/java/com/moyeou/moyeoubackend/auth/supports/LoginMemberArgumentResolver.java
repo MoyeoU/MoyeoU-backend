@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.auth.supports;
 
+import com.moyeou.moyeoubackend.auth.exception.UnauthenticatedException;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,11 +19,14 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        return Long.parseLong(userDetails.getUsername());
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal();
+            return Long.parseLong(userDetails.getUsername());
+        } catch (Exception e) {
+            throw new UnauthenticatedException("요청에 인증 토큰을 포함해주세요.");
+        }
     }
 }
