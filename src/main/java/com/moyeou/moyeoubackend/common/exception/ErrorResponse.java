@@ -1,11 +1,15 @@
 package com.moyeou.moyeoubackend.common.exception;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
+@JsonInclude(NON_NULL)
 @NoArgsConstructor
 public class ErrorResponse {
     private String code;
