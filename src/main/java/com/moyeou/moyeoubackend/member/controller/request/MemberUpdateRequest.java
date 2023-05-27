@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class UpdateRequest {
+public class MemberUpdateRequest {
     @NotEmpty(message = "소개글을 입력해주세요")
     private String introduction;
 

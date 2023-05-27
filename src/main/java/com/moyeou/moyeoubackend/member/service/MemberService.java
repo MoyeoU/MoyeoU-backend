@@ -1,7 +1,7 @@
 package com.moyeou.moyeoubackend.member.service;
 
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
-import com.moyeou.moyeoubackend.member.controller.request.UpdateRequest;
+import com.moyeou.moyeoubackend.member.controller.request.MemberUpdateRequest;
 import com.moyeou.moyeoubackend.file.service.FileSystemStorageService;
 import com.moyeou.moyeoubackend.member.controller.response.MemberResponse;
 import com.moyeou.moyeoubackend.member.domain.Member;
@@ -56,7 +56,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void update(Long memberId, UpdateRequest request) {
+    public void update(Long memberId, MemberUpdateRequest request) {
         Member member = findById(memberId);
         String path = fileUploader.upload(request.getFile());
         List<String> hashtags = request.getHashtags();
