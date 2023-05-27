@@ -1,6 +1,8 @@
 package com.moyeou.moyeoubackend.file.controller;
 
 import com.moyeou.moyeoubackend.file.service.FileSystemStorageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -11,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "File", description = "파일 관련 API")
 public class FileController {
     private final FileSystemStorageService fileSystemStorageService;
 
+    @Operation(summary = "파일 조회")
     @GetMapping("/files/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         Resource file = fileSystemStorageService.loadAsResource(filename);
