@@ -6,6 +6,7 @@ import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.post.controller.request.AnswerRequest;
 import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
+import com.moyeou.moyeoubackend.post.controller.request.CommentRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.domain.Item;
@@ -125,6 +126,25 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].member.nickname").value("작성자"))
                 .andExpect(jsonPath("$[1].member.nickname").value("회원2"));
+    }
+
+    @DisplayName("댓글을 작성한다")
+    @Test
+    void 댓글_작성() throws Exception {
+        var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
+        var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+
+        var response = createPost(member1);
+        var postUri = uri(response);
+
+        mockMvc.perform(post(postUri + "/comments")
+                .header("Authorization", "Bearer " + member2)
+                .content(objectMapper.writeValueAsString(new CommentRequest("하이")))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        findPost(member1, postUri)
+                .andExpect(jsonPath("$.comments[0].nickname").value("회원2"))
+                .andExpect(jsonPath("$.comments[0].content").value("하이"));
     }
 
     private String signUpLogin(String email, String password, String nickname) throws Exception {
