@@ -34,4 +34,5 @@ public class UpdateRequest {
 
     private List<String> hashtags;
 
+    private List<String> items;
 }
