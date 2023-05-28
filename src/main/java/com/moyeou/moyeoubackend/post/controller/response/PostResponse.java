@@ -25,6 +25,7 @@ public class PostResponse {
     private HostResponse host;
     private String content;
     private Boolean isHost;
+    private List<CommentResponse> comments;
 
     public static PostResponse from(Post post, Boolean isHost) {
         return new PostResponse(
@@ -40,7 +41,10 @@ public class PostResponse {
                         .collect(Collectors.toList()),
                 HostResponse.from(post.getHost()),
                 post.getContent(),
-                isHost
+                isHost,
+                post.getComments().stream()
+                        .map(CommentResponse::from)
+                        .collect(Collectors.toList())
         );
     }
 }

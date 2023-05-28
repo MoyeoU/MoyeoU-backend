@@ -73,6 +73,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
     @Builder
     public Post(String title, Integer headCount, String operationWay, String expectedDate,
                 String estimatedDuration, String content, Member host, List<String> items) {
@@ -167,6 +170,10 @@ public class Post {
         }
         generateEvaluations();
         this.status = END;
+    }
+
+    public void addComment(Member member, String comment) {
+        this.comments.add(new Comment(this, member, comment));
     }
 
     private void generateEvaluations() {

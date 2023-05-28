@@ -2,6 +2,7 @@ package com.moyeou.moyeoubackend.post.controller;
 
 import com.moyeou.moyeoubackend.auth.supports.LoginMember;
 import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
+import com.moyeou.moyeoubackend.post.controller.request.CommentRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
@@ -77,5 +78,11 @@ public class PostController {
     @PostMapping("/posts/{postId}/end")
     public void end(@PathVariable Long postId, @LoginMember Long memberId) {
         postService.end(postId, memberId);
+    }
+
+    @Operation(summary = "댓글 작성")
+    @PostMapping("/posts/{postId}/comments")
+    public void createComment(@PathVariable Long postId, @LoginMember Long memberId, @RequestBody CommentRequest request) {
+        postService.createComment(postId, memberId, request);
     }
 }
