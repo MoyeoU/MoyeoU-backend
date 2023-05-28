@@ -105,7 +105,7 @@ public class Post {
     }
 
     public void update(String title, Integer headCount, String operationWay, String expectedDate,
-                       String estimatedDuration, String content, List<PostHashtag> postHashtags) {
+                       String estimatedDuration, String content, List<PostHashtag> postHashtags, List<String> items) {
         this.title = title;
         this.headCount = headCount;
         this.operationWay = operationWay;
@@ -116,6 +116,15 @@ public class Post {
         this.postHashtags.addAll(
                 postHashtags.stream()
                         .filter(p -> !this.postHashtags.contains(p))
+                        .collect(Collectors.toList())
+        );
+        List<Item> i = items.stream()
+                .map(name -> new Item(this, name))
+                .collect(Collectors.toList());
+        this.items.removeIf(item -> !i.contains(item));
+        this.items.addAll(
+                i.stream()
+                        .filter(item -> !this.items.contains(item))
                         .collect(Collectors.toList())
         );
     }

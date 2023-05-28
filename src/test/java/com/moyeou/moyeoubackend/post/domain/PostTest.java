@@ -4,7 +4,7 @@ import com.moyeou.moyeoubackend.member.domain.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -96,6 +96,40 @@ public class PostTest {
                 .hasMessageContaining("신청한 회원만 취소할 수 있습니다.");
     }
 
+    @DisplayName("작성자가 모집을 완료한다")
+    @Test
+    void 모집_완료() {
+        var host = createMember("host@o.cnu.ac.kr");
+        var post = createPost(host, 3);
+
+        // 모집 완료
+        post.complete(host);
+
+        assertThat(post.getStatus()).isEqualTo(PostStatus.COMPLETED);
+    }
+
+    @DisplayName("작성자가 스터디를 종료한다")
+    @Test
+    void 스터디_종료() {
+        var host = createMember("host@o.cnu.ac.kr");
+        var member1 = createMember("member1@o.cnu.ac.kr");
+        var member2 = createMember("member2@o.cnu.ac.kr");
+
+        var post = createPost(host, 3);
+        post.attend(member1);
+        post.attend(member2);
+
+        // 스터디 종료
+        post.end(host);
+
+        // 종료 후 평가 6개 생성
+        List<String> evaluatorEmails = post.getEvaluations().stream()
+                .map(evaluation -> evaluation.getEvaluator().getEmail())
+                .collect(Collectors.toList());
+        assertThat(post.getEvaluations().size()).isEqualTo(6);
+        assertThat(evaluatorEmails).contains("host@o.cnu.ac.kr", "member1@o.cnu.ac.kr", "member2@o.cnu.ac.kr");
+    }
+
     private Member createMember(String email) {
         return new Member(email, "컴퓨터융합학부", 202000000, "nickname", "pw");
     }
@@ -108,7 +142,7 @@ public class PostTest {
                 .estimatedDuration("3개월")
                 .content("<h1>같이 공부해요!</h1>")
                 .host(host)
-                .items(new ArrayList<>())
+                .items(Arrays.asList("거주지", "성별"))
                 .build();
     }
 }

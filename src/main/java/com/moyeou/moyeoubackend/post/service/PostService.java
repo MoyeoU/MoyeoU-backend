@@ -6,6 +6,7 @@ import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
+import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.domain.*;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
@@ -55,7 +56,7 @@ public class PostService {
                 request.getTitle(), request.getHeadCount(),
                 request.getOperationWay(), request.getExpectedDate(),
                 request.getEstimatedDuration(), request.getContent(),
-                postHashtags
+                postHashtags, request.getItems()
         );
     }
 
@@ -67,6 +68,13 @@ public class PostService {
             throw new UnAuthorizedException("작성자만 삭제할 수 있습니다.");
         }
         postRepository.deleteById(post.getId());
+    }
+
+    public List<ItemResponse> findForm(Long postId) {
+        Post post = findByPostId(postId);
+        return post.getItems().stream()
+                .map(ItemResponse::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional

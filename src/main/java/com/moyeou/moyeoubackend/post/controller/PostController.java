@@ -4,6 +4,7 @@ import com.moyeou.moyeoubackend.auth.supports.LoginMember;
 import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
+import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,6 +46,12 @@ public class PostController {
     @DeleteMapping("/posts/{postId}")
     public void delete(@PathVariable Long postId, @LoginMember Long memberId) {
         postService.delete(postId, memberId);
+    }
+
+    @Operation(summary = "신청폼 조회")
+    @GetMapping("/posts/{postId}/form")
+    public List<ItemResponse> findForm(@PathVariable Long postId) {
+        return postService.findForm(postId);
     }
 
     @Operation(summary = "참여 신청")
