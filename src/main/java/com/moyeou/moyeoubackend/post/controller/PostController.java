@@ -85,4 +85,10 @@ public class PostController {
     public void createComment(@PathVariable Long postId, @LoginMember Long memberId, @RequestBody CommentRequest request) {
         postService.createComment(postId, memberId, request);
     }
+
+    @Operation(summary = "댓글 삭제")
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    public void deleteComment(@LoginMember Long memberId, @PathVariable Long postId, @PathVariable Long commentId) {
+        postService.deleteComment(memberId, postId, commentId);
+    }
 }

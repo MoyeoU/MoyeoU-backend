@@ -50,7 +50,7 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         if (!post.isHost(member)) {
-            throw new UnAuthorizedException("작성자만 삭제할 수 있습니다.");
+            throw new UnAuthorizedException("작성자만 수정할 수 있습니다.");
         }
         List<PostHashtag> postHashtags = getPostHashtags(request.getHashtags(), post);
         post.update(
@@ -122,6 +122,13 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.addComment(member, request.getContent());
+    }
+
+    @Transactional
+    public void deleteComment(Long memberId, Long postId, Long commentId) {
+        Member member = findByMemberId(memberId);
+        Post post = findByPostId(postId);
+        post.removeComment(member, commentId);
     }
 
     private Member findByMemberId(Long memberId) {
