@@ -42,4 +42,8 @@ public class Comment {
         this.content = content;
         this.createdAt = LocalDateTime.now();
     }
+
+    public boolean isAuthor(Member member) {
+        return this.member.equals(member);
+    }
 }
