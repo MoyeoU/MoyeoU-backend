@@ -10,6 +10,7 @@ import com.moyeou.moyeoubackend.post.controller.request.CommentRequest;
 import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.domain.Item;
+import com.moyeou.moyeoubackend.post.repository.CommentRepository;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
 import com.moyeou.moyeoubackend.post.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -38,6 +40,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
     private PostRepository postRepository;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @BeforeEach
     void setUp() {
@@ -133,18 +137,37 @@ public class PostAcceptanceTest extends AcceptanceTest {
     void 댓글_작성() throws Exception {
         var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
         var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
-
         var response = createPost(member1);
         var postUri = uri(response);
 
-        mockMvc.perform(post(postUri + "/comments")
-                .header("Authorization", "Bearer " + member2)
-                .content(objectMapper.writeValueAsString(new CommentRequest("하이")))
-                .contentType(MediaType.APPLICATION_JSON));
+        createComment(postUri + "/comments", "하이", member2);
 
         findPost(member1, postUri)
                 .andExpect(jsonPath("$.comments[0].nickname").value("회원2"))
                 .andExpect(jsonPath("$.comments[0].content").value("하이"));
+    }
+
+    @DisplayName("댓글을 삭제한다")
+    @Test
+    void 댓글_삭제() throws Exception {
+        var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
+        var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+        var response = createPost(member1);
+        var postUri = uri(response);
+
+        // member2가 댓글 2개 작성
+        createComment(postUri + "/comments", "댓글1", member2);
+        createComment(postUri + "/comments", "댓글2", member2);
+
+        // member2가 댓글 하나 삭제
+        Long id = commentRepository.findAll().get(0).getId();
+        mockMvc.perform(MockMvcRequestBuilders.delete(postUri + "/comments/" + id)
+                .header("Authorization", "Bearer " + member2))
+                .andExpect(status().isOk());
+
+        // 댓글 하나 남음
+        findPost(member1, postUri)
+                .andExpect(jsonPath("$.comments.length()").value(1));
     }
 
     private String signUpLogin(String email, String password, String nickname) throws Exception {
@@ -202,6 +225,13 @@ public class PostAcceptanceTest extends AcceptanceTest {
         return mockMvc.perform(post(uri + "/attend")
                 .header("Authorization", "Bearer " + token)
                 .content(objectMapper.writeValueAsString(createAttendRequest(postId)))
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    private ResultActions createComment(String uri, String content, String token) throws Exception {
+        return mockMvc.perform(post(uri)
+                .header("Authorization", "Bearer " + token)
+                .content(objectMapper.writeValueAsString(new CommentRequest(content)))
                 .contentType(MediaType.APPLICATION_JSON));
     }
 }
