@@ -3,10 +3,7 @@ package com.moyeou.moyeoubackend.post.service;
 import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
-import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
-import com.moyeou.moyeoubackend.post.controller.request.CommentRequest;
-import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
-import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
+import com.moyeou.moyeoubackend.post.controller.request.*;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.domain.*;
@@ -122,6 +119,13 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.addComment(member, request.getContent());
+    }
+
+    @Transactional
+    public void updateComment(Long memberId, Long postId, Long commentId, CommentUpdateRequest request) {
+        Member member = findByMemberId(memberId);
+        Post post = findByPostId(postId);
+        post.updateComment(member, commentId, request.getContent());
     }
 
     @Transactional

@@ -1,10 +1,7 @@
 package com.moyeou.moyeoubackend.post.controller;
 
 import com.moyeou.moyeoubackend.auth.supports.LoginMember;
-import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
-import com.moyeou.moyeoubackend.post.controller.request.CommentRequest;
-import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
-import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
+import com.moyeou.moyeoubackend.post.controller.request.*;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.service.PostService;
@@ -90,5 +87,12 @@ public class PostController {
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public void deleteComment(@LoginMember Long memberId, @PathVariable Long postId, @PathVariable Long commentId) {
         postService.deleteComment(memberId, postId, commentId);
+    }
+
+    @Operation(summary = "댓글 수정")
+    @PutMapping("/posts/{postId}/comments/{commentId}")
+    public void updateComment(@LoginMember Long memberId, @PathVariable Long postId, @PathVariable Long commentId,
+                              @RequestBody CommentUpdateRequest request) {
+        postService.updateComment(memberId, postId, commentId, request);
     }
 }

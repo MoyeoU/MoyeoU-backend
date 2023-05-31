@@ -46,4 +46,8 @@ public class Comment {
     public boolean isAuthor(Member member) {
         return this.member.equals(member);
     }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }
