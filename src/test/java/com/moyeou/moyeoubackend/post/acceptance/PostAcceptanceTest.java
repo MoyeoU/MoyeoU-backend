@@ -4,10 +4,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.moyeou.moyeoubackend.AcceptanceTest;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
-import com.moyeou.moyeoubackend.post.controller.request.AnswerRequest;
-import com.moyeou.moyeoubackend.post.controller.request.AttendRequest;
-import com.moyeou.moyeoubackend.post.controller.request.CommentRequest;
-import com.moyeou.moyeoubackend.post.controller.request.CreateRequest;
+import com.moyeou.moyeoubackend.post.controller.request.*;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.domain.Item;
 import com.moyeou.moyeoubackend.post.repository.CommentRepository;
@@ -29,8 +26,7 @@ import java.util.List;
 import static com.moyeou.moyeoubackend.TestUtils.id;
 import static com.moyeou.moyeoubackend.TestUtils.uri;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class PostAcceptanceTest extends AcceptanceTest {
@@ -168,6 +164,27 @@ public class PostAcceptanceTest extends AcceptanceTest {
         // 댓글 하나 남음
         findPost(member1, postUri)
                 .andExpect(jsonPath("$.comments.length()").value(1));
+    }
+
+    @DisplayName("댓글을 수정한다")
+    @Test
+    void 댓글_수정() throws Exception {
+        var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
+        var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+        var response = createPost(member1);
+        var postUri = uri(response);
+
+        createComment(postUri + "/comments", "댓글1", member2);
+
+        Long id = commentRepository.findAll().get(0).getId();
+        mockMvc.perform(put(postUri + "/comments/" + id)
+                        .header("Authorization", "Bearer " + member2)
+                .content(objectMapper.writeValueAsString(new CommentUpdateRequest("댓글 수정")))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        findPost(member1, postUri)
+                .andExpect(jsonPath("$.comments[0].content").value("댓글 수정"));
     }
 
     private String signUpLogin(String email, String password, String nickname) throws Exception {

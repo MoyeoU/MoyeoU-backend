@@ -176,6 +176,17 @@ public class Post {
         this.comments.add(new Comment(this, member, comment));
     }
 
+    public void updateComment(Member member, Long commentId, String content) {
+        Comment comment = comments.stream()
+                .filter(it -> it.getId().equals(commentId))
+                .findAny()
+                .orElseThrow(() -> new EntityNotFoundException("댓글(commentId: " + commentId + ")이 존재하지 않습니다."));
+        if (!comment.isAuthor(member)) {
+            throw new UnAuthorizedException("작성자만 수정할 수 있습니다.");
+        }
+        comment.update(content);
+    }
+
     public void removeComment(Member member, Long commentId) {
         Comment comment = comments.stream()
                 .filter(it -> it.getId().equals(commentId))
