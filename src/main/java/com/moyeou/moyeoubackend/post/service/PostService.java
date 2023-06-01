@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -151,6 +152,9 @@ public class PostService {
     }
 
     private List<PostHashtag> getPostHashtags(List<String> hashtags, Post post) {
+        if (hashtags == null || hashtags.isEmpty()) {
+            return Collections.emptyList();
+        }
         List<PostHashtag> postHashtags = new ArrayList<>();
         for (String name : hashtags) {
             Hashtag hashtag = hashtagRepository.findByName(name)
