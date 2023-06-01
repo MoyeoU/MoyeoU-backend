@@ -1,0 +1,42 @@
+### 회원 가입
+POST http://localhost:8080/sign-up
+Content-Type: application/json
+
+{
+  "email": "email@email.com",
+  "password": "password",
+  "nickname": "테스트 유저",
+  "department": "컴퓨터공학과",
+  "studentNumber": "202300001"
+}
+
+### 로그인
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "email": "email@email.com",
+  "password": "password"
+}
+
+
+### 회원 가입
+POST http://localhost:8080/sign-up
+Content-Type: application/json
+
+{
+  "email": "test@email.com",
+  "password": "password",
+  "nickname": "신규 유저",
+  "department": "기계공학과",
+  "studentNumber": "202300002"
+}
+
+### 로그인
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "email": "test@email.com",
+  "password": "password"
+}
