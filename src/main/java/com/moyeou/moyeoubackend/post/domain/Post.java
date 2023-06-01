@@ -73,8 +73,8 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+    @Embedded
+    private Comments comments = new Comments();
 
     @Builder
     public Post(String title, Integer headCount, String operationWay, String expectedDate,
@@ -173,29 +173,15 @@ public class Post {
     }
 
     public void addComment(Member member, String comment) {
-        this.comments.add(new Comment(this, member, comment));
+        comments.addComment(this, member, comment);
     }
 
     public void updateComment(Member member, Long commentId, String content) {
-        Comment comment = comments.stream()
-                .filter(it -> it.getId().equals(commentId))
-                .findAny()
-                .orElseThrow(() -> new EntityNotFoundException("댓글(commentId: " + commentId + ")이 존재하지 않습니다."));
-        if (!comment.isAuthor(member)) {
-            throw new UnAuthorizedException("작성자만 수정할 수 있습니다.");
-        }
-        comment.update(content);
+        comments.updateComment(member, commentId, content);
     }
 
     public void removeComment(Member member, Long commentId) {
-        Comment comment = comments.stream()
-                .filter(it -> it.getId().equals(commentId))
-                .findAny()
-                .orElseThrow(() -> new EntityNotFoundException("댓글(commentId: " + commentId + ")이 존재하지 않습니다."));
-        if (!comment.isAuthor(member)) {
-            throw new UnAuthorizedException("작성자만 삭제할 수 있습니다.");
-        }
-        comments.remove(comment);
+        comments.removeComment(member, commentId);
     }
 
     private void generateEvaluations() {
@@ -208,5 +194,9 @@ public class Post {
                 evaluations.add(evaluation);
             }
         }
+    }
+
+    public List<Comment> getComments() {
+        return comments.getComments();
     }
 }

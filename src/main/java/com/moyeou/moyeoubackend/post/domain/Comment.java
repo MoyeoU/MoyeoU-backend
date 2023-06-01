@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.post.domain;
 
+import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,7 +48,10 @@ public class Comment {
         return this.member.equals(member);
     }
 
-    public void update(String content) {
+    public void update(Member member, String content) {
+        if (!isAuthor(member)) {
+            throw new UnAuthorizedException("작성자만 수정할 수 있습니다.");
+        }
         this.content = content;
     }
 }
