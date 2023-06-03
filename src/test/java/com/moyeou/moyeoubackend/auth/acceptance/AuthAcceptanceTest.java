@@ -63,7 +63,7 @@ public class AuthAcceptanceTest extends AcceptanceTest {
 
     private void signUp(String email, String password) throws Exception {
         var request = SignUpRequest.builder()
-                .email(email).department("컴퓨터융합학부").studentNumber(202000000)
+                .email(email).department("컴퓨터융합학부")
                 .nickname("nick").password(password).build();
         mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))

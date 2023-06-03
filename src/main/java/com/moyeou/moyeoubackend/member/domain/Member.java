@@ -27,9 +27,6 @@ public class Member {
     @Column(name = "department", nullable = false)
     private String department;
 
-    @Column(name = "student_number", nullable = false)
-    private Integer studentNumber;
-
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
@@ -49,10 +46,9 @@ public class Member {
     private List<MemberHashtag> memberHashtags = new ArrayList<>();
 
     @Builder
-    public Member(String email, String department, Integer studentNumber, String nickname, String password) {
+    public Member(String email, String department, String nickname, String password) {
         this.email = email;
         this.department = department;
-        this.studentNumber = studentNumber;
         this.nickname = nickname;
         this.password = password;
     }

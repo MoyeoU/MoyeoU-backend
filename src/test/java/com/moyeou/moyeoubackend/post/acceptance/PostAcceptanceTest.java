@@ -189,7 +189,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
     private String signUpLogin(String email, String password, String nickname) throws Exception {
         var request = SignUpRequest.builder()
-                .email(email).department("컴퓨터융합학부").studentNumber(202000000)
+                .email(email).department("컴퓨터융합학부")
                 .nickname(nickname).password(password).build();
         mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))

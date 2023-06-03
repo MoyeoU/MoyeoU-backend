@@ -49,7 +49,7 @@ public class EvaluationServiceTest {
     }
 
     private Member saveMember(String email) {
-        return memberRepository.save(new Member(email, "컴퓨터융합학부", 202000000, "nickname", "pw"));
+        return memberRepository.save(new Member(email, "컴퓨터융합학부", "nickname", "pw"));
     }
 
     private Post savePost(Member host) {

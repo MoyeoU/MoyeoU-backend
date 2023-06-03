@@ -131,7 +131,7 @@ public class PostTest {
     }
 
     private Member createMember(String email) {
-        return new Member(email, "컴퓨터융합학부", 202000000, "nickname", "pw");
+        return new Member(email, "컴퓨터융합학부", "nickname", "pw");
     }
     private Post createPost(Member host, Integer headCount) {
         return Post.builder()
