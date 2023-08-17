@@ -5,12 +5,9 @@ import com.moyeou.moyeoubackend.AcceptanceTest;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.post.controller.request.*;
-import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.domain.Item;
 import com.moyeou.moyeoubackend.post.repository.CommentRepository;
-import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
 import com.moyeou.moyeoubackend.post.repository.PostRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,20 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class PostAcceptanceTest extends AcceptanceTest {
     @Autowired
-    private HashtagRepository hashtagRepository;
-    @Autowired
     private PostRepository postRepository;
     @Autowired
     private EntityManager entityManager;
     @Autowired
     private CommentRepository commentRepository;
-
-    @BeforeEach
-    void setUp() {
-        hashtagRepository.save(new Hashtag("Java"));
-        hashtagRepository.save(new Hashtag("JPA"));
-        hashtagRepository.save(new Hashtag("Spring"));
-    }
 
     @DisplayName("게시물을 생성하고, 조회한다.")
     @Test
@@ -63,7 +51,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         findPost(member2, post)
                 .andExpect(jsonPath("$.content").value("<h1>같이 공부해요!</h1>"))
                 .andExpect(jsonPath("$.isHost").value(false))
-                .andExpect(jsonPath("$.hashtags", containsInAnyOrder("Java", "JPA", "Spring")));
+                .andExpect(jsonPath("$.hashtags", containsInAnyOrder("백엔드", "프론트엔드", "코딩테스트")));
     }
 
     @DisplayName("스터디에 참여한다.")
@@ -210,7 +198,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var post = CreateRequest.builder()
                 .title("JPA 스터디").headCount(4).operationWay("대면")
                 .expectedDate("06-01").estimatedDuration("3개월").content("<h1>같이 공부해요!</h1>")
-                .hashtags(Arrays.asList("Java", "JPA", "Spring"))
+                .hashtags(Arrays.asList("백엔드", "프론트엔드", "코딩테스트"))
                 .items(Arrays.asList("나이", "성별", "거주지"))
                 .build();
         return mockMvc.perform(post("/posts")
