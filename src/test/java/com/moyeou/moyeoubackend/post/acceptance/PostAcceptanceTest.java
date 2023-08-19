@@ -54,6 +54,145 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .andExpect(jsonPath("$.hashtags", containsInAnyOrder("백엔드", "프론트엔드", "코딩테스트")));
     }
 
+    @DisplayName("게시물 전체 조회")
+    @Test
+    void 전체보기() throws Exception {
+        createPosts(false);
+
+        var request = PostsRequest.builder()
+                .categoryId(null).hashTagId(null).title("").status("PROGRESS").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(6)));
+    }
+
+    @DisplayName("제목 검색")
+    @Test
+    void 제목() throws Exception {
+        createPosts(false);
+
+        // "코테" -> post1, post2
+        var request = PostsRequest.builder()
+                .categoryId(null).hashTagId(null).title("코테").status("PROGRESS").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[*].title", everyItem(containsString("코테"))));
+    }
+
+    @DisplayName("카테고리로 조회")
+    @Test
+    void 카테고리() throws Exception {
+        createPosts(false);
+
+        // "프로그래밍" 카테고리 -> post1, post2, post4, post5
+        var request = PostsRequest.builder()
+                .categoryId(2L).hashTagId(null).title("").status("PROGRESS").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(4)));
+    }
+
+    @DisplayName("모집상태로 조회")
+    @Test
+    void 모집상태() throws Exception {
+        createPosts(true);
+
+        // "모집완료" -> post1, post5
+        var request = PostsRequest.builder()
+                .categoryId(null).hashTagId(null).title("").status("COMPLETED").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].title", is("코테 스터디")))
+                .andExpect(jsonPath("$[1].title", is("iOS 공부해요")));
+    }
+
+    @DisplayName("카테고리, 해시태그로 조회")
+    @Test
+    void 카테고리_해시태그() throws Exception {
+        createPosts(true);
+
+        // "어학" 카테고리, "토익" 해시태그 -> post3, post6
+        var request = PostsRequest.builder()
+                .categoryId(1L).hashTagId(1L).title("").status("PROGRESS").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[*].hashtags", everyItem(hasItem("토익"))));
+    }
+
+    @DisplayName("카테고리, 제목으로 조회")
+    @Test
+    void 카테고리_제목() throws Exception {
+        createPosts(true);
+
+        // "프로그래밍" 카테고리, "스터디" -> post4
+        var request = PostsRequest.builder()
+                .categoryId(2L).hashTagId(null).title("스터디").status("PROGRESS").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].title", is("스프링 스터디")));
+    }
+
+    @DisplayName("카테고리, 모집상태로 조회")
+    @Test
+    void 카테고리_모집상태() throws Exception {
+        createPosts(true);
+
+        // "프로그래밍" 카테고리, "모집완료" -> post1, post5
+        var request = PostsRequest.builder()
+                .categoryId(2L).hashTagId(null).title("").status("COMPLETED").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].title", is("코테 스터디")))
+                .andExpect(jsonPath("$[1].title", is("iOS 공부해요")));
+    }
+
+    @DisplayName("제목, 모집상태로 조회")
+    @Test
+    void 제목_모집상태() throws Exception {
+        createPosts(true);
+
+        // "어학", "모집완료" -> 없음
+        var request = PostsRequest.builder()
+                .categoryId(null).hashTagId(null).title("어학").status("COMPLETED").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @DisplayName("카테고리, 해시태그, 제목으로 조회")
+    @Test
+    void 카테고리_해시태그_제목() throws Exception {
+        createPosts(true);
+
+        // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "스프링" -> post4
+        var request = PostsRequest.builder()
+                .categoryId(2L).hashTagId(10L).title("스프링").status("PROGRESS").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].title", is("스프링 스터디")));
+    }
+
+    @DisplayName("카테고리, 해시태그, 모집상태로 조회")
+    @Test
+    void 카테고리_해시태그_모집상태() throws Exception {
+        createPosts(true);
+
+        // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "모집완료" -> post1
+        var request = PostsRequest.builder()
+                .categoryId(2L).hashTagId(10L).title("").status("COMPLETED").build();
+        findPosts(request)
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].title", is("코테 스터디")));
+    }
+
+    @DisplayName("카테고리, 해시태그, 제목, 모집상태로 조회")
+    @Test
+    void 카테고리_해시태그_제목_모집상태() throws Exception {
+        createPosts(true);
+
+        // "어학" 카테고리, "토익 스피킹" 해시태그, "토스", "모집완료" -> 없음
+        var request = PostsRequest.builder()
+                .categoryId(1L).hashTagId(2L).title("토스").status("COMPLETED").build();
+        findPosts(request).andExpect(jsonPath("$", hasSize(0)));
+    }
+
     @DisplayName("스터디에 참여한다.")
     @Test
     void attend() throws Exception {
@@ -207,6 +346,19 @@ public class PostAcceptanceTest extends AcceptanceTest {
                         .contentType(MediaType.APPLICATION_JSON));
     }
 
+    private ResultActions createPost(String token, String title, List<String> hashtags) throws Exception {
+        var post = CreateRequest.builder()
+                .title(title).headCount(4).operationWay("대면")
+                .expectedDate("06-01").estimatedDuration("3개월")
+                .content("<h1>같이 공부해요!</h1>").hashtags(hashtags)
+                .items(Arrays.asList("나이", "성별", "거주지"))
+                .build();
+        return mockMvc.perform(post("/posts")
+                .header("Authorization", "Bearer " + token)
+                .content(objectMapper.writeValueAsString(post))
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
     private ResultActions findPost(String token, String location) throws Exception {
         return mockMvc.perform(get(location)
                         .header("Authorization", "Bearer " + token))
@@ -238,5 +390,36 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .header("Authorization", "Bearer " + token)
                 .content(objectMapper.writeValueAsString(new CommentRequest(content)))
                 .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    private ResultActions findPosts(Object request) throws Exception {
+        return mockMvc.perform(get("/posts?page=0&size=12")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    void createPosts(boolean update) throws Exception {
+        var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
+        var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+
+        var post1 = createPost(member1, "코테 스터디", Arrays.asList("코딩테스트"));
+        createPost(member2, "코테준비해요!", Arrays.asList("코딩테스트"));
+        createPost(member1, "어학 스터디", Arrays.asList("토익", "토플"));
+        createPost(member2, "스프링 스터디", Arrays.asList("백엔드", "코딩테스트"));
+        var post5 = createPost(member1, "iOS 공부해요", Arrays.asList("모바일"));
+        createPost(member2, "같이 토스?", Arrays.asList("토익 스피킹", "토익"));
+
+        // post1의 모집상태를 모집완료로 변경.
+        if (update) {
+            var post1Uri = uri(post1);
+            var post5Uri = uri(post5);
+            mockMvc.perform(post(post1Uri + "/complete")
+                            .header("Authorization", "Bearer " + member1))
+                    .andExpect(status().isOk());
+            mockMvc.perform(post(post5Uri + "/complete")
+                            .header("Authorization", "Bearer " + member1))
+                    .andExpect(status().isOk());
+        }
     }
 }
