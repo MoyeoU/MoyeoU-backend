@@ -4,10 +4,12 @@ import com.moyeou.moyeoubackend.auth.supports.LoginMember;
 import com.moyeou.moyeoubackend.post.controller.request.*;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
+import com.moyeou.moyeoubackend.post.controller.response.PostsResponse;
 import com.moyeou.moyeoubackend.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,14 @@ public class PostController {
     public ResponseEntity<Void> create(@Valid @RequestBody CreateRequest request, @LoginMember Long memberId) {
         Long postId = postService.create(request, memberId);
         return ResponseEntity.created(URI.create("/posts/" + postId)).build();
+    }
+
+    @Operation(summary = "게시물 조회")
+    @GetMapping("/posts")
+    public List<PostsResponse> findAll(@RequestBody PostsRequest request, Pageable pageable) {
+        return postService.findAll(
+                request.getTitle(), request.getCategoryId(),
+                request.getHashTagId(), request.getStatus(), pageable);
     }
 
     @Operation(summary = "게시물 상세 조회")

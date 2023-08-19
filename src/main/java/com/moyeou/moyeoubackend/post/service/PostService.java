@@ -6,11 +6,14 @@ import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.*;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
+import com.moyeou.moyeoubackend.post.controller.response.PostsResponse;
 import com.moyeou.moyeoubackend.post.domain.*;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
 import com.moyeou.moyeoubackend.post.repository.ItemRepository;
+import com.moyeou.moyeoubackend.post.repository.PostQueryRepository;
 import com.moyeou.moyeoubackend.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostQueryRepository postQueryRepository;
     private final MemberRepository memberRepository;
     private final HashtagRepository hashtagRepository;
     private final ItemRepository itemRepository;
@@ -41,6 +45,13 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         return PostResponse.from(post, post.isHost(member));
+    }
+
+    public List<PostsResponse> findAll(String title, Long categoryId, Long hashtagId, PostStatus status, Pageable pageable) {
+        return postQueryRepository.findAllByCondition(title, categoryId, hashtagId, status, pageable)
+                .stream()
+                .map(PostsResponse::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional
