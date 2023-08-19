@@ -1,7 +1,3 @@
-jwt:
-  secret-key: "secret"
-  refresh-key: "refresh"
-
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
@@ -15,23 +11,3 @@ springdoc:
       enabled: true
   cache:
     disabled: true
-
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/MOYEOU_DB?serverTimezone=Asia/Seoul
-    username: user
-    password: password
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: always
