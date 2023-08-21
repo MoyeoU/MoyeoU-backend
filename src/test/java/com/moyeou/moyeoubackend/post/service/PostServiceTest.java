@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.post.service;
 
+import com.moyeou.moyeoubackend.IntegrationTest;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
@@ -10,8 +11,6 @@ import com.moyeou.moyeoubackend.post.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Transactional
-@SpringBootTest
-public class PostServiceTest {
+public class PostServiceTest extends IntegrationTest {
     @Autowired
     MemberRepository memberRepository;
     @Autowired
