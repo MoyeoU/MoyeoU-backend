@@ -57,7 +57,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("게시물 전체 조회")
     @Test
     void 전체보기() throws Exception {
-        createPosts(false);
+        createPosts();
 
         var request = PostsRequest.builder()
                 .categoryId(null).hashTagId(null).title("").status("PROGRESS").build();
@@ -68,7 +68,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("제목 검색")
     @Test
     void 제목() throws Exception {
-        createPosts(false);
+        createPosts();
 
         // "코테" -> post1, post2
         var request = PostsRequest.builder()
@@ -81,7 +81,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("카테고리로 조회")
     @Test
     void 카테고리() throws Exception {
-        createPosts(false);
+        createPosts();
 
         // "프로그래밍" 카테고리 -> post1, post2, post4, post5
         var request = PostsRequest.builder()
@@ -93,7 +93,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("모집상태로 조회")
     @Test
     void 모집상태() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "모집완료" -> post1, post5
         var request = PostsRequest.builder()
@@ -107,7 +107,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("카테고리, 해시태그로 조회")
     @Test
     void 카테고리_해시태그() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "어학" 카테고리, "토익" 해시태그 -> post3, post6
         var request = PostsRequest.builder()
@@ -120,7 +120,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("카테고리, 제목으로 조회")
     @Test
     void 카테고리_제목() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "스터디" -> post4
         var request = PostsRequest.builder()
@@ -133,7 +133,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("카테고리, 모집상태로 조회")
     @Test
     void 카테고리_모집상태() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "모집완료" -> post1, post5
         var request = PostsRequest.builder()
@@ -147,7 +147,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("제목, 모집상태로 조회")
     @Test
     void 제목_모집상태() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "어학", "모집완료" -> 없음
         var request = PostsRequest.builder()
@@ -159,7 +159,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("카테고리, 해시태그, 제목으로 조회")
     @Test
     void 카테고리_해시태그_제목() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "스프링" -> post4
         var request = PostsRequest.builder()
@@ -172,7 +172,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("카테고리, 해시태그, 모집상태로 조회")
     @Test
     void 카테고리_해시태그_모집상태() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "모집완료" -> post1
         var request = PostsRequest.builder()
@@ -185,7 +185,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     @DisplayName("카테고리, 해시태그, 제목, 모집상태로 조회")
     @Test
     void 카테고리_해시태그_제목_모집상태() throws Exception {
-        createPosts(true);
+        createPostsAndUpdateStatus();
 
         // "어학" 카테고리, "토익 스피킹" 해시태그, "토스", "모집완료" -> 없음
         var request = PostsRequest.builder()
@@ -399,27 +399,37 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .andExpect(status().isOk());
     }
 
-    void createPosts(boolean update) throws Exception {
+    void createPosts() throws Exception {
         var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
         var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
 
-        var post1 = createPost(member1, "코테 스터디", Arrays.asList("코딩테스트"));
-        createPost(member2, "코테준비해요!", Arrays.asList("코딩테스트"));
-        createPost(member1, "어학 스터디", Arrays.asList("토익", "토플"));
-        createPost(member2, "스프링 스터디", Arrays.asList("백엔드", "코딩테스트"));
-        var post5 = createPost(member1, "iOS 공부해요", Arrays.asList("모바일"));
-        createPost(member2, "같이 토스?", Arrays.asList("토익 스피킹", "토익"));
+        createPost(member1, "코테 스터디", Arrays.asList("코딩테스트")); // post1
+        createPost(member2, "코테준비해요!", Arrays.asList("코딩테스트")); // post2
+        createPost(member1, "어학 스터디", Arrays.asList("토익", "토플")); // post3
+        createPost(member2, "스프링 스터디", Arrays.asList("백엔드", "코딩테스트")); // post4
+        createPost(member1, "iOS 공부해요", Arrays.asList("모바일")); // post5
+        createPost(member2, "같이 토스?", Arrays.asList("토익 스피킹", "토익")); // post6
+    }
 
-        // post1의 모집상태를 모집완료로 변경.
-        if (update) {
-            var post1Uri = uri(post1);
-            var post5Uri = uri(post5);
-            mockMvc.perform(post(post1Uri + "/complete")
-                            .header("Authorization", "Bearer " + member1))
-                    .andExpect(status().isOk());
-            mockMvc.perform(post(post5Uri + "/complete")
-                            .header("Authorization", "Bearer " + member1))
-                    .andExpect(status().isOk());
-        }
+    void createPostsAndUpdateStatus() throws Exception {
+        var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
+        var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+
+        var post1 = createPost(member1, "코테 스터디", Arrays.asList("코딩테스트")); // post1
+        createPost(member2, "코테준비해요!", Arrays.asList("코딩테스트")); // post2
+        createPost(member1, "어학 스터디", Arrays.asList("토익", "토플")); // post3
+        createPost(member2, "스프링 스터디", Arrays.asList("백엔드", "코딩테스트")); // post4
+        var post5 = createPost(member1, "iOS 공부해요", Arrays.asList("모바일")); // post5
+        createPost(member2, "같이 토스?", Arrays.asList("토익 스피킹", "토익")); // post6
+
+        // post1, post5의 모집상태를 모집완료로 변경.
+        var post1Uri = uri(post1);
+        var post5Uri = uri(post5);
+        mockMvc.perform(post(post1Uri + "/complete")
+                        .header("Authorization", "Bearer " + member1))
+                .andExpect(status().isOk());
+        mockMvc.perform(post(post5Uri + "/complete")
+                        .header("Authorization", "Bearer " + member1))
+                .andExpect(status().isOk());
     }
 }
