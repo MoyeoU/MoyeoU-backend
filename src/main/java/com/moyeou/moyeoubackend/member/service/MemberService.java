@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,13 +60,7 @@ public class MemberService {
     public void update(Long memberId, MemberUpdateRequest request) {
         Member member = findById(memberId);
         String path = fileUploader.upload(request.getFile());
-        List<String> hashtags = request.getHashtags();
-        List<MemberHashtag> memberHashtags = new ArrayList<>();
-        for (String name : hashtags) {
-            Hashtag hashtag = hashtagRepository.findByName(name)
-                    .orElseThrow(() -> new EntityNotFoundException("해시태그가 존재하지 않습니다."));
-            memberHashtags.add(new MemberHashtag(member, hashtag));
-        }
+        List<MemberHashtag> memberHashtags = getMemberHashtags(request.getHashtags(), member);
         member.update(request.getIntroduction(), request.getNickname(), path, memberHashtags);
     }
 
@@ -77,5 +72,20 @@ public class MemberService {
     private Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("회원(memberId: " + memberId + ")이 존재하지 않습니다."));
+    }
+
+    private List<MemberHashtag> getMemberHashtags(List<String> hashtags, Member member) {
+        if (hashtags == null || hashtags.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<MemberHashtag> memberHashtag = new ArrayList<>();
+        for (String name : hashtags) {
+            Hashtag hashtag = hashtagRepository.findByName(name)
+                    .orElseThrow(() -> new EntityNotFoundException("해시태그가 존재하지 않습니다."));
+            memberHashtag.add(new MemberHashtag(member, hashtag));
+        }
+
+        return memberHashtag;
     }
 }

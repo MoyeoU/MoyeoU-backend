@@ -10,7 +10,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class MemberUpdateRequest {
-    @NotEmpty(message = "소개글을 입력해주세요")
     private String introduction;
 
     @NotEmpty(message = "닉네임을 입력해주세요")

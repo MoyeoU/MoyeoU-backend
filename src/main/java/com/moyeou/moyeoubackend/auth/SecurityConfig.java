@@ -4,6 +4,7 @@ import com.moyeou.moyeoubackend.auth.supports.JwtAuthenticationFilter;
 import com.moyeou.moyeoubackend.auth.supports.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,6 +38,7 @@ public class SecurityConfig {
         http
                 .authorizeRequests()
                 .antMatchers("/sign-up", "/login", "/refresh", "/api-docs/**","/swagger-ui/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/posts").permitAll()
                 .anyRequest().authenticated();
         return http.build();
     }

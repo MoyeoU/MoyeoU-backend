@@ -42,7 +42,7 @@ public class FileSystemStorageService implements FileUploader {
     public String upload(MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                throw new StorageException("파일이 비어있습니다");
+                return null;
             }
             String originalFilename = file.getOriginalFilename();
             String extension = Objects.requireNonNull(originalFilename).substring(originalFilename.lastIndexOf("."));

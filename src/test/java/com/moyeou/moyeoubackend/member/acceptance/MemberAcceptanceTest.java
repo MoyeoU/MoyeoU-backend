@@ -28,7 +28,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void signUpWithInvalidParameter() throws Exception {
         var request = SignUpRequest.builder()
-                .email("").department("").studentNumber(202000000)
+                .email("").department("")
                 .nickname("nick").password("pw").build();
         mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
@@ -45,7 +45,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         signUp("example@o.cnu.ac.kr", "pw");
         var request = SignUpRequest.builder()
                 .email("example@o.cnu.ac.kr").department("컴퓨터융합학부")
-                .studentNumber(202000000).nickname("nick").password("pw").build();
+                .nickname("nick").password("pw").build();
         mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -94,7 +94,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
 
     private ResultActions signUp(String email, String password) throws Exception {
         var request = SignUpRequest.builder()
-                .email(email).department("컴퓨터융합학부").studentNumber(202000000)
+                .email(email).department("컴퓨터융합학부")
                 .nickname("nick").password(password).build();
         return mockMvc.perform(post("/sign-up")
                         .content(objectMapper.writeValueAsString(request))

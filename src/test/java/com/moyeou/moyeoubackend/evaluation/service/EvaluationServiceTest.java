@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.evaluation.service;
 
+import com.moyeou.moyeoubackend.IntegrationTest;
 import com.moyeou.moyeoubackend.evaluation.controller.request.EvaluationRequest;
 import com.moyeou.moyeoubackend.evaluation.domain.Evaluation;
 import com.moyeou.moyeoubackend.evaluation.repository.EvaluationRepository;
@@ -10,17 +11,13 @@ import com.moyeou.moyeoubackend.post.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Transactional
-@SpringBootTest
-public class EvaluationServiceTest {
+public class EvaluationServiceTest extends IntegrationTest {
     @Autowired
     private EvaluationService evaluationService;
     @Autowired
@@ -49,7 +46,7 @@ public class EvaluationServiceTest {
     }
 
     private Member saveMember(String email) {
-        return memberRepository.save(new Member(email, "컴퓨터융합학부", 202000000, "nickname", "pw"));
+        return memberRepository.save(new Member(email, "컴퓨터융합학부", "nickname", "pw"));
     }
 
     private Post savePost(Member host) {

@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -26,9 +27,6 @@ public class Member {
 
     @Column(name = "department", nullable = false)
     private String department;
-
-    @Column(name = "student_number", nullable = false)
-    private Integer studentNumber;
 
     @Column(name = "nickname", nullable = false)
     private String nickname;
@@ -49,10 +47,9 @@ public class Member {
     private List<MemberHashtag> memberHashtags = new ArrayList<>();
 
     @Builder
-    public Member(String email, String department, Integer studentNumber, String nickname, String password) {
+    public Member(String email, String department, String nickname, String password) {
         this.email = email;
         this.department = department;
-        this.studentNumber = studentNumber;
         this.nickname = nickname;
         this.password = password;
     }
@@ -61,6 +58,11 @@ public class Member {
         this.introduction = introduction;
         this.nickname = nickname;
         this.imagePath = imagePath;
-        this.memberHashtags.addAll(memberHashtags);
+        this.memberHashtags.removeIf(hashtag -> !memberHashtags.contains(hashtag));
+        this.memberHashtags.addAll(
+                memberHashtags.stream()
+                        .filter(hashtag -> !this.memberHashtags.contains(hashtag))
+                        .collect(Collectors.toList())
+        );
     }
 }

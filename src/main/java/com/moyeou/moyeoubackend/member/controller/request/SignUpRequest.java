@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Builder
@@ -20,9 +19,6 @@ public class SignUpRequest {
     @NotEmpty(message = "학과를 입력해주세요")
     private String department;
 
-    @NotNull(message = "학번을 입력해주세요")
-    private Integer studentNumber;
-
     @NotEmpty(message = "닉네임을 입력해주세요")
     private String nickname;
 
@@ -30,6 +26,6 @@ public class SignUpRequest {
     private String password;
 
     public Member toEntity(String password) {
-        return new Member(email, department, studentNumber, nickname, password);
+        return new Member(email, department, nickname, password);
     }
 }

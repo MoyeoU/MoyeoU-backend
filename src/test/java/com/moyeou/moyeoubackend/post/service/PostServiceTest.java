@@ -1,19 +1,16 @@
 package com.moyeou.moyeoubackend.post.service;
 
+import com.moyeou.moyeoubackend.IntegrationTest;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.UpdateRequest;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
-import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.domain.Post;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
 import com.moyeou.moyeoubackend.post.repository.PostRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,9 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Transactional
-@SpringBootTest
-public class PostServiceTest {
+public class PostServiceTest extends IntegrationTest {
     @Autowired
     MemberRepository memberRepository;
     @Autowired
@@ -33,13 +28,6 @@ public class PostServiceTest {
     @Autowired
     PostService postService;
 
-    @BeforeEach
-    void setUp() {
-        hashtagRepository.save(new Hashtag("Java"));
-        hashtagRepository.save(new Hashtag("JPA"));
-        hashtagRepository.save(new Hashtag("Spring"));
-    }
-
     @DisplayName("게시물을 수정한다")
     @Test
     void updatePost() {
@@ -48,7 +36,7 @@ public class PostServiceTest {
         UpdateRequest updateRequest = UpdateRequest.builder()
                 .title("JPA 스터디").headCount(3).operationWay("온라인")
                 .expectedDate("06-01").estimatedDuration("3개월").content("<h1>같이 공부해요!</h1>")
-                .hashtags(Arrays.asList("Java", "JPA")).items(Arrays.asList("거주지", "들은 강의"))
+                .hashtags(Arrays.asList("백엔드", "코딩테스트")).items(Arrays.asList("거주지", "들은 강의"))
                 .build();
 
         postService.update(post.getId(), member.getId(), updateRequest);
@@ -59,8 +47,9 @@ public class PostServiceTest {
         List<String> items = post.getItems().stream()
                 .map(item -> item.getName())
                 .collect(Collectors.toList());
+
         assertThat(post.getOperationWay()).isEqualTo("온라인");
-        assertThat(hashtags).containsExactly("Java", "JPA");
+        assertThat(hashtags).containsExactly("백엔드", "코딩테스트");
         assertThat(items).containsExactly("거주지", "들은 강의");
     }
 
@@ -87,7 +76,7 @@ public class PostServiceTest {
     }
 
     private Member saveMember(String email) {
-        return memberRepository.save(new Member(email, "컴퓨터융합학부", 202000000, "nickname", "pw"));
+        return memberRepository.save(new Member(email, "컴퓨터융합학부", "nickname", "pw"));
     }
 
     private Post savePost(Member host) {
