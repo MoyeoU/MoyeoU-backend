@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +62,9 @@ public class Post {
     @JoinColumn(name = "member_id")
     private Member host;
 
+    @Column(name = "createdAt", nullable = false)
+    private LocalDate createdAt;
+
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     private List<Participation> participations = new ArrayList<>();
 
@@ -91,6 +95,7 @@ public class Post {
         this.content = content;
         this.status = PROGRESS;
         this.host = host;
+        this.createdAt = LocalDate.now();
         this.participations.add(new Participation(host, this));
         this.items.addAll(
                 items.stream()

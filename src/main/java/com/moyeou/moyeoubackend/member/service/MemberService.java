@@ -8,7 +8,7 @@ import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.domain.MemberHashtag;
 import com.moyeou.moyeoubackend.member.exception.DuplicateMemberException;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
-import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
+import com.moyeou.moyeoubackend.post.controller.response.ActivityPostResponse;
 import com.moyeou.moyeoubackend.post.domain.Hashtag;
 import com.moyeou.moyeoubackend.post.domain.Participation;
 import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
@@ -48,10 +48,10 @@ public class MemberService {
 
     public MemberResponse find(Long memberId) {
         Member member = findById(memberId);
-        List<PostResponse> memberParticipations = participationRepository.findAllByMemberId(memberId).stream()
+        List<ActivityPostResponse> memberParticipations = participationRepository.findAllByMemberId(memberId).stream()
                 .map(Participation::getPost)
                 .filter(post -> post.getStatus() == PROGRESS || post.getStatus() == COMPLETED)
-                .map(post -> PostResponse.from(post, post.isHost(member)))
+                .map(post -> ActivityPostResponse.from(post, post.isHost(member)))
                 .collect(Collectors.toList());
         return MemberResponse.from(member, memberParticipations);
     }
