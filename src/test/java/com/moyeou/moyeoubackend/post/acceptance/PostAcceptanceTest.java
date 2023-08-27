@@ -211,6 +211,13 @@ public class PostAcceptanceTest extends AcceptanceTest {
         // 현재 참여 인원 : 2
         findPost(member, postUri)
                 .andExpect(jsonPath("$.currentCount").value(2));
+
+        // 내 활동 내역 조회
+        mockMvc.perform(get("/members/me")
+                        .header("Authorization", "Bearer " + member))
+                .andExpect(jsonPath("$.activityList.length()").value(1))
+                .andExpect(jsonPath("$.activityList[0].status").value("PROGRESS"))
+                .andExpect(jsonPath("$.activityList[0].isHost").value(false));
     }
 
     @DisplayName("작성자가 스터디에 참여한다.")
@@ -367,8 +374,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
     private Object createAttendRequest(Long postId) {
         List<AnswerRequest> answers = new ArrayList<>();
-        entityManager.flush();
-        entityManager.clear();
+//        entityManager.flush();
+//        entityManager.clear();
         var post = postRepository.findById(postId).get();
         for (Item item : post.getItems()) {
             AnswerRequest answerRequest = new AnswerRequest(item.getId(), "대전");

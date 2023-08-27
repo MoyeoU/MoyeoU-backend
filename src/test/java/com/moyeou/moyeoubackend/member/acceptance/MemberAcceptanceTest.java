@@ -1,8 +1,8 @@
 package com.moyeou.moyeoubackend.member.acceptance;
 
+import com.jayway.jsonpath.JsonPath;
 import com.moyeou.moyeoubackend.AcceptanceTest;
 import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
-import com.moyeou.moyeoubackend.auth.controller.response.LoginResponse;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -111,7 +111,6 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 .getResponse()
                 .getContentAsString(UTF_8);
 
-        LoginResponse loginResponse = objectMapper.readValue(response, LoginResponse.class);
-        return loginResponse.getAccessToken();
+        return JsonPath.read(response, "$.accessToken");
     }
 }

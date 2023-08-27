@@ -26,6 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Transactional
     public LoginResponse login(LoginRequest loginRequest) {
         Member member = memberRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(NonExistentEmailException::new);
@@ -39,6 +40,7 @@ public class AuthService {
         throw new IncorrectPasswordException();
     }
 
+    @Transactional
     public RefreshResponse refresh(String token) {
         if (reissueable(token)) {
             refreshTokenRepository.deleteByRefreshToken(token);
@@ -51,6 +53,11 @@ public class AuthService {
             return new RefreshResponse(accessToken, refreshToken);
         }
         throw new UnauthenticatedException("다시 로그인 해주세요.");
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        refreshTokenRepository.deleteByRefreshToken(refreshToken);
     }
 
     private boolean reissueable(String token) {

@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.auth;
 
+import com.moyeou.moyeoubackend.auth.supports.CustomAuthenticationEntryPoint;
 import com.moyeou.moyeoubackend.auth.supports.JwtAuthenticationFilter;
 import com.moyeou.moyeoubackend.auth.supports.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,7 +41,13 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/sign-up", "/login", "/refresh", "/api-docs/**","/swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/posts").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .logout().disable();
         return http.build();
     }
 
