@@ -8,32 +8,76 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.moyeou.moyeoubackend.post.domain.ParticipationStatus.ACCEPT;
+import static com.moyeou.moyeoubackend.post.domain.ParticipationStatus.WAITING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PostTest {
 
-    @DisplayName("신청한다")
+    @DisplayName("신청하고 작성자가 수락한다")
     @Test
-    void 모집_신청() {
+    void 모집_신청_수락() {
         var host = createMember("host@o.cnu.ac.kr");
         var member1 = createMember("member1@o.cnu.ac.kr");
         var member2 = createMember("member2@o.cnu.ac.kr");
 
         var post = createPost(host, 3);
-        post.attend(member1);
-        post.attend(member2);
+        Participation participation1 = post.attend(member1);
+        Participation participation2 = post.attend(member2);
+
+        // 작성자가 신청을 수락한다
+        post.accept(host, participation1);
+        post.accept(host, participation2);
 
         List<String> emails = post.getParticipations().stream()
                 .map(Participation::getMember)
                 .map(Member::getEmail)
                 .collect(Collectors.toList());
 
+        List<ParticipationStatus> status = post.getParticipations().stream()
+                .map(Participation::getStatus)
+                .collect(Collectors.toList());
+
         assertAll(
                 () -> assertThat(emails).containsExactly("host@o.cnu.ac.kr", "member1@o.cnu.ac.kr", "member2@o.cnu.ac.kr"),
                 () -> assertThat(post.getCurrentCount()).isEqualTo(3),
-                () -> assertThat(post.getParticipations().size()).isEqualTo(3)
+                () -> assertThat(post.getParticipations().size()).isEqualTo(3),
+                () -> assertThat(status).allMatch(s -> s == ACCEPT)
+        );
+    }
+
+    @DisplayName("신청하고 작성자가 아직 수락하지 않았다")
+    @Test
+    void 모집_신청_대기() {
+        var host = createMember("host@o.cnu.ac.kr");
+        var member = createMember("member1@o.cnu.ac.kr");
+
+        var post = createPost(host, 3);
+        Participation participation = post.attend(member);
+
+        assertAll(
+                () -> assertThat(post.getCurrentCount()).isEqualTo(1),
+                () -> assertThat(post.getParticipations().size()).isEqualTo(2),
+                () -> assertThat(participation.getStatus()).isEqualTo(WAITING)
+        );
+    }
+
+    @DisplayName("신청하고 작성자가 거절한다")
+    @Test
+    void 모집_신청_거절() {
+        var host = createMember("host@o.cnu.ac.kr");
+        var member = createMember("member1@o.cnu.ac.kr");
+
+        var post = createPost(host, 3);
+        Participation participation = post.attend(member);
+
+        post.reject(host, participation);
+
+        assertAll(
+                () -> assertThat(post.getCurrentCount()).isEqualTo(1),
+                () -> assertThat(post.getParticipations().size()).isEqualTo(1)
         );
     }
 
@@ -47,8 +91,12 @@ public class PostTest {
 
         // 모집 정원 3명
         var post = createPost(host, 3);
-        post.attend(member1);
-        post.attend(member2);
+        Participation participation1 = post.attend(member1);
+        Participation participation2 = post.attend(member2);
+
+        // 작성자가 신청 수락
+        post.accept(host, participation1);
+        post.accept(host, participation2);
 
         assertThatThrownBy(() -> post.attend(member3))
                 .isInstanceOf(IllegalStateException.class)
@@ -63,10 +111,13 @@ public class PostTest {
         var member2 = createMember("member2@o.cnu.ac.kr");
 
         var post = createPost(host, 3);
-        post.attend(member1);
-        post.attend(member2);
+        Participation participation1 = post.attend(member1);
+        Participation participation2 = post.attend(member2);
 
-        // member2 신청 취소
+        post.accept(host, participation1);
+        post.accept(host, participation2);
+
+        // member2 신청이 수락된 후 신청 취소
         post.cancel(member2);
 
         List<String> emails = post.getParticipations().stream()
@@ -108,7 +159,7 @@ public class PostTest {
         assertThat(post.getStatus()).isEqualTo(PostStatus.COMPLETED);
     }
 
-    @DisplayName("작성자가 스터디를 종료한다")
+    @DisplayName("작성자가 스터디를 종료하고 평가가 생성된다")
     @Test
     void 스터디_종료() {
         var host = createMember("host@o.cnu.ac.kr");
@@ -116,8 +167,11 @@ public class PostTest {
         var member2 = createMember("member2@o.cnu.ac.kr");
 
         var post = createPost(host, 3);
-        post.attend(member1);
-        post.attend(member2);
+        Participation participation1 = post.attend(member1);
+        Participation participation2 = post.attend(member2);
+
+        post.accept(host, participation1);
+        post.accept(host, participation2);
 
         // 스터디 종료
         post.end(host);
