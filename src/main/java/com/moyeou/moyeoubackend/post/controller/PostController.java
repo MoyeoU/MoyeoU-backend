@@ -75,6 +75,18 @@ public class PostController {
         postService.cancel(postId, memberId);
     }
 
+    @Operation(summary = "신청 수락")
+    @PostMapping("/posts/{postId}/participations/{participationId}/accept")
+    public void accept(@PathVariable Long postId, @PathVariable Long participationId, @LoginMember Long memberId) {
+        postService.accept(postId, participationId, memberId);
+    }
+
+    @Operation(summary = "신청 거절")
+    @PostMapping("/posts/{postId}/participations/{participationId}/reject")
+    public void reject(@PathVariable Long postId, @PathVariable Long participationId, @LoginMember Long memberId) {
+        postService.reject(postId, participationId, memberId);
+    }
+
     @Operation(summary = "모집 완료")
     @PostMapping("/posts/{postId}/complete")
     public void complete(@PathVariable Long postId, @LoginMember Long memberId) {

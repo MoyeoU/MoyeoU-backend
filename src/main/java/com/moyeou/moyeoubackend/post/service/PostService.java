@@ -8,10 +8,7 @@ import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostsResponse;
 import com.moyeou.moyeoubackend.post.domain.*;
-import com.moyeou.moyeoubackend.post.repository.HashtagRepository;
-import com.moyeou.moyeoubackend.post.repository.ItemRepository;
-import com.moyeou.moyeoubackend.post.repository.PostQueryRepository;
-import com.moyeou.moyeoubackend.post.repository.PostRepository;
+import com.moyeou.moyeoubackend.post.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,12 +22,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
     private final MemberRepository memberRepository;
     private final HashtagRepository hashtagRepository;
     private final ItemRepository itemRepository;
+    private final ParticipationRepository participationRepository;
 
     @Transactional
     public Long create(CreateRequest request, Long memberId) {
@@ -113,6 +112,22 @@ public class PostService {
     }
 
     @Transactional
+    public void accept(Long postId, Long participationId, Long memberId) {
+        Member member = findByMemberId(memberId);
+        Post post = findByPostId(postId);
+        Participation participation = findByParticipationId(participationId);
+        post.accept(member, participation);
+    }
+
+    @Transactional
+    public void reject(Long postId, Long participationId, Long memberId) {
+        Member member = findByMemberId(memberId);
+        Post post = findByPostId(postId);
+        Participation participation = findByParticipationId(participationId);
+        post.reject(member, participation);
+    }
+
+    @Transactional
     public void complete(Long postId, Long memberId) {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
@@ -160,6 +175,11 @@ public class PostService {
     private Item findByItemId(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("항목(itemId: " + itemId + ")이 존재하지 않습니다."));
+    }
+
+    private Participation findByParticipationId(Long participationId) {
+        return participationRepository.findById(participationId)
+                .orElseThrow(() -> new EntityNotFoundException("참여(participationId: " + participationId + ")가 존재하지 않습니다."));
     }
 
     private List<PostHashtag> getPostHashtags(List<String> hashtags, Post post) {
