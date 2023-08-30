@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PostAcceptanceTest extends AcceptanceTest {
     @Autowired
     private PostRepository postRepository;
-    @Autowired
-    private EntityManager entityManager;
     @Autowired
     private CommentRepository commentRepository;
 
@@ -200,13 +197,21 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var member = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
 
         // host가 게시물 생성
-        var response = createPost(host);
-        var postUri = uri(response);
+        var post = createPost(host);
+        var postUri = uri(post);
 
         // member가 신청
-        attend(postUri, member)
+        var participation = attend(postUri, member)
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", startsWith(postUri + "/participations/")));
+
+        // 작성자가 신청 수락 전 현재 참여 인원 : 1(작성자)
+        findPost(member, postUri)
+                .andExpect(jsonPath("$.currentCount").value(1));
+
+        // 작성자가 신청 수락
+        mockMvc.perform(post(uri(participation) + "/accept")
+                .header("Authorization", "Bearer " + host));
 
         // 현재 참여 인원 : 2
         findPost(member, postUri)
@@ -226,11 +231,10 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var host = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
 
         // host가 게시물 생성
-        var response = createPost(host);
-        var postUri = uri(response);
+        var post = createPost(host);
 
         // host가 신청 -> exception
-        attend(postUri, host)
+        attend(uri(post), host)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("4007"));
     }
@@ -245,15 +249,21 @@ public class PostAcceptanceTest extends AcceptanceTest {
         var response = createPost(host);
         var postUri = uri(response);
 
-        attend(postUri, member1);
-        attend(postUri, member2);
+        var participation1 = attend(postUri, member1);
+        var participation2 = attend(postUri, member2);
+
+        // 스터디 신청 수락
+        mockMvc.perform(post(uri(participation1) + "/accept")
+                .header("Authorization", "Bearer " + host));
+        mockMvc.perform(post(uri(participation2) + "/accept")
+                .header("Authorization", "Bearer " + host));
 
         // 스터디 종료
         mockMvc.perform(post(postUri + "/end")
                         .header("Authorization", "Bearer " + host))
                 .andExpect(status().isOk());
 
-        // 평가해야 할 스터디원 목록 조회
+        // member1이 평가해야 할 스터디원 목록 조회
         mockMvc.perform(get(postUri + "/evaluations")
                         .header("Authorization", "Bearer " + member1))
                 .andExpect(status().isOk())
@@ -374,8 +384,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
     private Object createAttendRequest(Long postId) {
         List<AnswerRequest> answers = new ArrayList<>();
-//        entityManager.flush();
-//        entityManager.clear();
         var post = postRepository.findById(postId).get();
         for (Item item : post.getItems()) {
             AnswerRequest answerRequest = new AnswerRequest(item.getId(), "대전");

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.moyeou.moyeoubackend.post.domain.ParticipationStatus.*;
 import static com.moyeou.moyeoubackend.post.domain.PostStatus.*;
 import static com.moyeou.moyeoubackend.post.domain.PostStatus.COMPLETED;
 import static javax.persistence.CascadeType.ALL;
@@ -96,7 +97,7 @@ public class Post {
         this.status = PROGRESS;
         this.host = host;
         this.createdAt = LocalDate.now();
-        this.participations.add(new Participation(host, this));
+        this.participations.add(new Participation(host, this, ACCEPT));
         this.items.addAll(
                 items.stream()
                         .map(name -> new Item(this, name))
@@ -144,9 +145,8 @@ public class Post {
         if (currentCount >= headCount) {
             throw new IllegalStateException("모집 정원이 초과되었습니다.");
         }
-        Participation participation = new Participation(member, this);
+        Participation participation = new Participation(member, this, WAITING);
         participations.add(participation);
-        currentCount++;
         return participation;
     }
 
@@ -159,7 +159,22 @@ public class Post {
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("신청한 회원만 취소할 수 있습니다."));
         participations.remove(participation);
-        currentCount--;
+        if (participation.getStatus() == ACCEPT) currentCount--;
+    }
+
+    public void accept(Member member, Participation participation) {
+        if (!isHost(member)) {
+            throw new UnAuthorizedException("작성자만 수락할 수 있습니다.");
+        }
+        participation.changeStatus(ACCEPT);
+        currentCount++;
+    }
+
+    public void reject(Member member, Participation participation) {
+        if (!isHost(member)) {
+            throw new UnAuthorizedException("작성자만 거절할 수 있습니다.");
+        }
+        participations.remove(participation);
     }
 
     public void complete(Member member) {
@@ -190,11 +205,15 @@ public class Post {
     }
 
     private void generateEvaluations() {
-        for (int i = 0; i < participations.size(); i++) {
-            for (int j = 0; j < participations.size(); j++) {
+        List<Participation> acceptParticipations = participations.stream()
+                .filter(participation -> participation.getStatus() == ACCEPT)
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < acceptParticipations.size(); i++) {
+            for (int j = 0; j < acceptParticipations.size(); j++) {
                 if (i == j) continue;
-                Member evaluator = participations.get(i).getMember();
-                Member evaluatee = participations.get(j).getMember();
+                Member evaluator = acceptParticipations.get(i).getMember();
+                Member evaluatee = acceptParticipations.get(j).getMember();
                 Evaluation evaluation = new Evaluation(evaluator, evaluatee, this);
                 evaluations.add(evaluation);
             }
