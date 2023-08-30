@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -37,10 +38,15 @@ public class Participation {
     @OneToMany(mappedBy = "participation", cascade = CascadeType.ALL)
     private List<Answer> answers = new ArrayList<>();
 
-    public Participation(Member member, Post post) {
+    @Enumerated(value = STRING)
+    @Column(name = "status", nullable = false)
+    private ParticipationStatus status;
+
+    public Participation(Member member, Post post, ParticipationStatus status) {
         this.member = member;
         this.post = post;
         this.participatedAt = LocalDateTime.now();
+        this.status = status;
     }
 
     public void addAnswers(List<Answer> answers) {
@@ -49,5 +55,9 @@ public class Participation {
 
     public boolean isMatch(Member member) {
         return this.member.equals(member);
+    }
+
+    public void changeStatus(ParticipationStatus status) {
+        this.status = status;
     }
 }
