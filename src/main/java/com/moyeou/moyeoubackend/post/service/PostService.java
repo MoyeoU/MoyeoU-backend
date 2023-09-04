@@ -3,6 +3,9 @@ package com.moyeou.moyeoubackend.post.service;
 import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
+import com.moyeou.moyeoubackend.notification.NotificationService;
+import com.moyeou.moyeoubackend.notification.domain.*;
+import com.moyeou.moyeoubackend.notification.repository.NotificationRepository;
 import com.moyeou.moyeoubackend.post.controller.request.*;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
@@ -30,6 +33,8 @@ public class PostService {
     private final HashtagRepository hashtagRepository;
     private final ItemRepository itemRepository;
     private final ParticipationRepository participationRepository;
+    private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public Long create(CreateRequest request, Long memberId) {
@@ -101,6 +106,12 @@ public class PostService {
                 .collect(Collectors.toList());
         participation.addAnswers(answers);
         postRepository.flush();
+
+        Long hostId = post.getHost().getId();
+        notificationService.sendMessage(hostId, "신청");
+        Notification notification = new Notification(hostId, NotificationType.ATTEND, member, post);
+        notificationRepository.save(notification);
+
         return participation.getId();
     }
 
@@ -109,6 +120,11 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.cancel(member);
+
+        Long hostId = post.getHost().getId();
+        notificationService.sendMessage(hostId, "신청 취소");
+        Notification notification = new Notification(hostId, NotificationType.CANCEL, member, post);
+        notificationRepository.save(notification);
     }
 
     @Transactional
@@ -117,6 +133,11 @@ public class PostService {
         Post post = findByPostId(postId);
         Participation participation = findByParticipationId(participationId);
         post.accept(member, participation);
+
+        Long attendId = participation.getMember().getId();
+        notificationService.sendMessage(attendId, "신청 수락");
+        Notification notification = new Notification(attendId, NotificationType.ACCEPT, post);
+        notificationRepository.save(notification);
     }
 
     @Transactional
@@ -125,6 +146,11 @@ public class PostService {
         Post post = findByPostId(postId);
         Participation participation = findByParticipationId(participationId);
         post.reject(member, participation);
+
+        Long attendId = participation.getMember().getId();
+        notificationService.sendMessage(attendId, "신청 거절");
+        Notification notification = new Notification(attendId, NotificationType.REJECT, post);
+        notificationRepository.save(notification);
     }
 
     @Transactional
@@ -132,6 +158,13 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.complete(member);
+
+        for (Participation participation : post.getParticipations()) {
+            Long attendId = participation.getMember().getId();
+            notificationService.sendMessage(attendId, "모집 완료. 스터디 시작");
+            Notification notification = new Notification(attendId, NotificationType.COMPLETE, post);
+            notificationRepository.save(notification);
+        }
     }
 
     @Transactional
@@ -139,6 +172,13 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.end(member);
+
+        for (Participation participation : post.getParticipations()) {
+            Long attendId = participation.getMember().getId();
+            notificationService.sendMessage(attendId, "스터디 종료. 평가ㄱㄱ");
+            Notification notification = new Notification(attendId, NotificationType.END, post);
+            notificationRepository.save(notification);
+        }
     }
 
     @Transactional
@@ -146,6 +186,11 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.addComment(member, request.getContent());
+
+        Long hostId = post.getHost().getId();
+        notificationService.sendMessage(hostId, "게시물에 댓글 달림");
+        Notification notification = new Notification(hostId, NotificationType.COMMENT, post);
+        notificationRepository.save(notification);
     }
 
     @Transactional

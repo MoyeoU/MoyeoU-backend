@@ -54,6 +54,7 @@ public class Participation {
     }
 
     public boolean isMatch(Member member) {
+        if (member == null) return false;
         return this.member.equals(member);
     }
 
