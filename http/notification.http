@@ -66,25 +66,10 @@ Content-Type: application/json
 }
 
 
-### sse 연결(host)
-GET http://localhost:8080/subscribe
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5LCJleHAiOjE2OTM4MjQ4ODl9.cjp4Ww2n360CNm2OhE-gswMqQezE9grZWDbjgNiuwbE
-
-
-### sse 연결(member1)
-GET http://localhost:8080/subscribe
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzODIxMzY5LCJleHAiOjE2OTM4MjQ5Njl9.vbNy7LhNd0lE6MZuzccQt3NAgIWg7GQLDnqea8xYuDc
-
-
-### sse 연결(member2)
-GET http://localhost:8080/subscribe
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNjkzODIxNDA4LCJleHAiOjE2OTM4MjUwMDh9.ouosB4OBgltHMaKrqYcTihYyKt8QkBrz_xPN2UJ_LNs
-
-
 ### 게시물 생성
 POST http://localhost:8080/posts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5LCJleHAiOjE2OTM4MjQ4ODl9.cjp4Ww2n360CNm2OhE-gswMqQezE9grZWDbjgNiuwbE
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
 
 {
   "operationWay": "온라인",
@@ -102,18 +87,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5L
 
 ### 게시물 조회
 GET http://localhost:8080/posts/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5LCJleHAiOjE2OTM4MjQ4ODl9.cjp4Ww2n360CNm2OhE-gswMqQezE9grZWDbjgNiuwbE
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
 
 
 ### 게시물 신청 폼 조회
 GET http://localhost:8080/posts/1/form
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzODIxMzY5LCJleHAiOjE2OTM4MjQ5Njl9.vbNy7LhNd0lE6MZuzccQt3NAgIWg7GQLDnqea8xYuDc
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
 
 
 ### 댓글 작성(member1)
 POST http://localhost:8080/posts/1/comments
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzODIxMzY5LCJleHAiOjE2OTM4MjQ5Njl9.vbNy7LhNd0lE6MZuzccQt3NAgIWg7GQLDnqea8xYuDc
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
 
 {
   "content": "~~~~~~~~?"
@@ -123,7 +108,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzODIxMzY5L
 ### 모집 신청(member1)
 POST http://localhost:8080/posts/1/attend
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzODIxMzY5LCJleHAiOjE2OTM4MjQ5Njl9.vbNy7LhNd0lE6MZuzccQt3NAgIWg7GQLDnqea8xYuDc
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
 
 {
   "answers": [
@@ -160,17 +145,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNjkzODIxNDA4L
 
 ### 알림 확인(host)
 GET http://localhost:8080/notifications
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5LCJleHAiOjE2OTM4MjQ4ODl9.cjp4Ww2n360CNm2OhE-gswMqQezE9grZWDbjgNiuwbE
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
 
 
 ### 신청 수락(host -> member1)
 POST http://localhost:8080/posts/1/participations/2/accept
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5LCJleHAiOjE2OTM4MjQ4ODl9.cjp4Ww2n360CNm2OhE-gswMqQezE9grZWDbjgNiuwbE
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
 
 
 ### 신청 거절(host -> member2)
 POST http://localhost:8080/posts/1/participations/3/reject
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5LCJleHAiOjE2OTM4MjQ4ODl9.cjp4Ww2n360CNm2OhE-gswMqQezE9grZWDbjgNiuwbE
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
 
 
 ### 알림 확인(member2)
@@ -180,9 +165,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNjkzODIxNDA4L
 
 ### 모집 완료(host)
 POST http://localhost:8080/posts/1/complete
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzODIxMjg5LCJleHAiOjE2OTM4MjQ4ODl9.cjp4Ww2n360CNm2OhE-gswMqQezE9grZWDbjgNiuwbE
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
 
 
 ### 알림 확인(member1)
 GET http://localhost:8080/notifications
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzODIxMzY5LCJleHAiOjE2OTM4MjQ5Njl9.vbNy7LhNd0lE6MZuzccQt3NAgIWg7GQLDnqea8xYuDc
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
