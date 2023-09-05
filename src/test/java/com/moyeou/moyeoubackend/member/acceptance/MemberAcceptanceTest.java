@@ -6,14 +6,15 @@ import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class MemberAcceptanceTest extends AcceptanceTest {
@@ -64,6 +65,43 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nickname").value("nick"))
                 .andExpect(jsonPath("$.email").value("example@o.cnu.ac.kr"));
+    }
+
+    @DisplayName("내 정보를 수정한다")
+    @Test
+    void updateMe() throws Exception {
+        signUp("example@o.cnu.ac.kr", "pw");
+        var accessToken = login("example@o.cnu.ac.kr", "pw");
+
+        // 내 정보 수정 전
+        mockMvc.perform(get("/members/me")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nickname").value("nick"))
+                .andExpect(jsonPath("$.introduction").doesNotExist())
+                .andExpect(jsonPath("$.hashtags", hasSize(0)));
+
+        // 내 정보 수정 요청
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "test.png", "image/png", "File content".getBytes());
+
+        mockMvc.perform(multipart(HttpMethod.PUT,  "/members/me")
+                        .file(file)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .param("nickname", "nickname")
+                        .param("introduction", "안녕하세요!")
+                        .param("hashtags", "백엔드").param("hashtags", "코딩테스트")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk());
+
+        // 내 정보 수정 후
+        mockMvc.perform(get("/members/me")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nickname").value("nickname"))
+                .andExpect(jsonPath("$.introduction").value("안녕하세요!"))
+                .andExpect(jsonPath("$.hashtags", contains("백엔드", "코딩테스트")))
+                .andExpect(jsonPath("$.imagePath").exists());
     }
 
     @DisplayName("다른 회원의 정보를 조회한다")

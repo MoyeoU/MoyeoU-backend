@@ -6,30 +6,41 @@ import com.moyeou.moyeoubackend.auth.controller.request.LoginRequest;
 import com.moyeou.moyeoubackend.member.controller.request.SignUpRequest;
 import com.moyeou.moyeoubackend.post.controller.request.*;
 import com.moyeou.moyeoubackend.post.domain.Item;
+import com.moyeou.moyeoubackend.post.domain.event.AcceptEvent;
+import com.moyeou.moyeoubackend.post.domain.event.AttendEvent;
+import com.moyeou.moyeoubackend.post.domain.event.CommentEvent;
+import com.moyeou.moyeoubackend.post.domain.event.EndEvent;
 import com.moyeou.moyeoubackend.post.repository.CommentRepository;
 import com.moyeou.moyeoubackend.post.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.moyeou.moyeoubackend.TestUtils.id;
 import static com.moyeou.moyeoubackend.TestUtils.uri;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@RecordApplicationEvents
 public class PostAcceptanceTest extends AcceptanceTest {
     @Autowired
     private PostRepository postRepository;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private ApplicationEvents events;
 
     @DisplayName("게시물을 생성하고, 조회한다.")
     @Test
@@ -190,7 +201,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         findPosts(request).andExpect(jsonPath("$", hasSize(0)));
     }
 
-    @DisplayName("스터디에 참여한다.")
+    @DisplayName("회원이 모집에 신청하고, 작성자는 신청을 수락한다")
     @Test
     void attend() throws Exception {
         var host = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
@@ -198,24 +209,15 @@ public class PostAcceptanceTest extends AcceptanceTest {
 
         // host가 게시물 생성
         var post = createPost(host);
-        var postUri = uri(post);
 
         // member가 신청
-        var participation = attend(postUri, member)
+        var participation = attend(uri(post), member)
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", startsWith(postUri + "/participations/")));
+                .andExpect(header().string("Location", startsWith(uri(post) + "/participations/")));
 
-        // 작성자가 신청 수락 전 현재 참여 인원 : 1(작성자)
-        findPost(member, postUri)
-                .andExpect(jsonPath("$.currentCount").value(1));
-
-        // 작성자가 신청 수락
+        // host가 신청 수락
         mockMvc.perform(post(uri(participation) + "/accept")
                 .header("Authorization", "Bearer " + host));
-
-        // 현재 참여 인원 : 2
-        findPost(member, postUri)
-                .andExpect(jsonPath("$.currentCount").value(2));
 
         // 내 활동 내역 조회
         mockMvc.perform(get("/members/me")
@@ -223,6 +225,12 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .andExpect(jsonPath("$.activityList.length()").value(1))
                 .andExpect(jsonPath("$.activityList[0].status").value("PROGRESS"))
                 .andExpect(jsonPath("$.activityList[0].isHost").value(false));
+
+        // 참가 이벤트 제대로 발행되었는지 확인
+        List<Long> attendEvent = events.stream(AttendEvent.class)
+                .map(AttendEvent::getPostId)
+                .collect(Collectors.toList());
+        assertThat(attendEvent).containsExactly(id(post));
     }
 
     @DisplayName("작성자가 스터디에 참여한다.")
@@ -239,7 +247,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .andExpect(jsonPath("$.code").value("4007"));
     }
 
-    @DisplayName("작성자가 스터디를 종료하고, 내가 평가해야 할 스터디원 목록을 조회한다.")
+    @DisplayName("작성자가 스터디를 종료하고, 스터디원은 내가 평가해야 할 목록을 조회한다.")
     @Test
     void end() throws Exception {
         var host = signUpLogin("example@o.cnu.ac.kr", "pw", "작성자");
@@ -270,13 +278,28 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].member.nickname").value("작성자"))
                 .andExpect(jsonPath("$[1].member.nickname").value("회원2"));
+
+        // 수락 이벤트 제대로 발행되었는지 확인
+        List<Long> acceptEvent = events.stream(AcceptEvent.class)
+                .map(AcceptEvent::getPostId)
+                .collect(Collectors.toList());
+
+        // 종료 이벤트 제대로 발행되었는지 확인
+        List<Long> endEvent = events.stream(EndEvent.class)
+                .map(EndEvent::getPostId)
+                .collect(Collectors.toList());
+
+        assertThat(acceptEvent).containsExactly(id(postUri), id(postUri));
+        assertThat(acceptEvent.size()).isEqualTo(2);
+        assertThat(endEvent).containsExactly(id(postUri));
     }
 
-    @DisplayName("댓글을 작성한다")
+    @DisplayName("회원이 댓글을 작성한다")
     @Test
     void 댓글_작성() throws Exception {
         var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
         var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+
         var response = createPost(member1);
         var postUri = uri(response);
 
@@ -285,6 +308,12 @@ public class PostAcceptanceTest extends AcceptanceTest {
         findPost(member1, postUri)
                 .andExpect(jsonPath("$.comments[0].nickname").value("회원2"))
                 .andExpect(jsonPath("$.comments[0].content").value("하이"));
+
+        // 댓글 이벤트 제대로 발행되었는지 확인
+        List<Long> commentEvent = events.stream(CommentEvent.class)
+                .map(CommentEvent::getPostId)
+                .collect(Collectors.toList());
+        assertThat(commentEvent).containsExactly(id(postUri));
     }
 
     @DisplayName("댓글을 삭제한다")
@@ -292,6 +321,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     void 댓글_삭제() throws Exception {
         var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
         var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+
         var response = createPost(member1);
         var postUri = uri(response);
 
@@ -302,7 +332,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         // member2가 댓글 하나 삭제
         Long id = commentRepository.findAll().get(0).getId();
         mockMvc.perform(MockMvcRequestBuilders.delete(postUri + "/comments/" + id)
-                .header("Authorization", "Bearer " + member2))
+                        .header("Authorization", "Bearer " + member2))
                 .andExpect(status().isOk());
 
         // 댓글 하나 남음
@@ -315,6 +345,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     void 댓글_수정() throws Exception {
         var member1 = signUpLogin("example@o.cnu.ac.kr", "pw", "회원1");
         var member2 = signUpLogin("ex@o.cnu.ac.kr", "password", "회원2");
+
         var response = createPost(member1);
         var postUri = uri(response);
 
@@ -323,8 +354,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
         Long id = commentRepository.findAll().get(0).getId();
         mockMvc.perform(put(postUri + "/comments/" + id)
                         .header("Authorization", "Bearer " + member2)
-                .content(objectMapper.writeValueAsString(new CommentUpdateRequest("댓글 수정")))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(new CommentUpdateRequest("댓글 수정")))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         findPost(member1, postUri)
@@ -340,7 +371,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        var response =  mockMvc.perform(post("/login")
+        var response = mockMvc.perform(post("/login")
                         .content(objectMapper.writeValueAsString(new LoginRequest(email, password)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -358,9 +389,9 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .items(Arrays.asList("나이", "성별", "거주지"))
                 .build();
         return mockMvc.perform(post("/posts")
-                        .header("Authorization", "Bearer " + token)
-                        .content(objectMapper.writeValueAsString(post))
-                        .contentType(MediaType.APPLICATION_JSON));
+                .header("Authorization", "Bearer " + token)
+                .content(objectMapper.writeValueAsString(post))
+                .contentType(MediaType.APPLICATION_JSON));
     }
 
     private ResultActions createPost(String token, String title, List<String> hashtags) throws Exception {

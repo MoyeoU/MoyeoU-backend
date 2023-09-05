@@ -8,8 +8,10 @@ import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostsResponse;
 import com.moyeou.moyeoubackend.post.domain.*;
+import com.moyeou.moyeoubackend.post.domain.event.*;
 import com.moyeou.moyeoubackend.post.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ public class PostService {
     private final HashtagRepository hashtagRepository;
     private final ItemRepository itemRepository;
     private final ParticipationRepository participationRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long create(CreateRequest request, Long memberId) {
@@ -101,6 +104,8 @@ public class PostService {
                 .collect(Collectors.toList());
         participation.addAnswers(answers);
         postRepository.flush();
+
+        eventPublisher.publishEvent(new AttendEvent(memberId, postId, participation.getId()));
         return participation.getId();
     }
 
@@ -109,6 +114,7 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.cancel(member);
+        eventPublisher.publishEvent(new CancelEvent(memberId, postId));
     }
 
     @Transactional
@@ -117,6 +123,7 @@ public class PostService {
         Post post = findByPostId(postId);
         Participation participation = findByParticipationId(participationId);
         post.accept(member, participation);
+        eventPublisher.publishEvent(new AcceptEvent(postId, participationId));
     }
 
     @Transactional
@@ -125,6 +132,7 @@ public class PostService {
         Post post = findByPostId(postId);
         Participation participation = findByParticipationId(participationId);
         post.reject(member, participation);
+        eventPublisher.publishEvent(new RejectEvent(postId, participationId));
     }
 
     @Transactional
@@ -132,6 +140,7 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.complete(member);
+        eventPublisher.publishEvent(new CompleteEvent(postId));
     }
 
     @Transactional
@@ -139,6 +148,7 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.end(member);
+        eventPublisher.publishEvent(new EndEvent(postId));
     }
 
     @Transactional
@@ -146,6 +156,7 @@ public class PostService {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         post.addComment(member, request.getContent());
+        eventPublisher.publishEvent(new CommentEvent(postId));
     }
 
     @Transactional
