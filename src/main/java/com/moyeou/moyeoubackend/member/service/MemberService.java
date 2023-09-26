@@ -24,8 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.moyeou.moyeoubackend.post.domain.PostStatus.COMPLETED;
-import static com.moyeou.moyeoubackend.post.domain.PostStatus.PROGRESS;
+import static com.moyeou.moyeoubackend.post.domain.PostStatus.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,7 +49,7 @@ public class MemberService {
         Member member = findById(memberId);
         List<ActivityPostResponse> memberParticipations = participationRepository.findAllByMemberId(memberId).stream()
                 .map(Participation::getPost)
-                .filter(post -> post.getStatus() == PROGRESS || post.getStatus() == COMPLETED)
+                .filter(post -> post.getStatus() == END || post.getStatus() == COMPLETED)
                 .map(post -> ActivityPostResponse.from(post, post.isHost(member)))
                 .collect(Collectors.toList());
         return MemberResponse.from(member, memberParticipations);

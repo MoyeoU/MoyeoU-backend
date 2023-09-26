@@ -219,13 +219,6 @@ public class PostAcceptanceTest extends AcceptanceTest {
         mockMvc.perform(post(uri(participation) + "/accept")
                 .header("Authorization", "Bearer " + host));
 
-        // 내 활동 내역 조회
-        mockMvc.perform(get("/members/me")
-                        .header("Authorization", "Bearer " + member))
-                .andExpect(jsonPath("$.activityList.length()").value(1))
-                .andExpect(jsonPath("$.activityList[0].status").value("PROGRESS"))
-                .andExpect(jsonPath("$.activityList[0].isHost").value(false));
-
         // 참가 이벤트 제대로 발행되었는지 확인
         List<Long> attendEvent = events.stream(AttendEvent.class)
                 .map(AttendEvent::getPostId)
