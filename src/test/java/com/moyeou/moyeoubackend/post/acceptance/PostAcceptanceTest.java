@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
@@ -67,9 +68,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
     void 전체보기() throws Exception {
         createPosts();
 
-        var request = PostsRequest.builder()
-                .categoryId(null).hashTagId(null).title("").status("PROGRESS").build();
-        findPosts(request)
+        findPosts(null, null, null, "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(6)));
     }
 
@@ -79,9 +78,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPosts();
 
         // "코테" -> post1, post2
-        var request = PostsRequest.builder()
-                .categoryId(null).hashTagId(null).title("코테").status("PROGRESS").build();
-        findPosts(request)
+        findPosts(null, null, "코테", "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].title", everyItem(containsString("코테"))));
     }
@@ -92,9 +89,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPosts();
 
         // "프로그래밍" 카테고리 -> post1, post2, post4, post5
-        var request = PostsRequest.builder()
-                .categoryId(2L).hashTagId(null).title("").status("PROGRESS").build();
-        findPosts(request)
+        findPosts(2L, null, null, "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(4)));
     }
 
@@ -104,9 +99,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "모집완료" -> post1, post5
-        var request = PostsRequest.builder()
-                .categoryId(null).hashTagId(null).title("").status("COMPLETED").build();
-        findPosts(request)
+        findPosts(null, null, null, "COMPLETED")
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].title", is("코테 스터디")))
                 .andExpect(jsonPath("$[1].title", is("iOS 공부해요")));
@@ -118,9 +111,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "어학" 카테고리, "토익" 해시태그 -> post3, post6
-        var request = PostsRequest.builder()
-                .categoryId(1L).hashTagId(1L).title("").status("PROGRESS").build();
-        findPosts(request)
+        findPosts(1L, 1L, null, "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].hashtags", everyItem(hasItem("토익"))));
     }
@@ -131,9 +122,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "스터디" -> post4
-        var request = PostsRequest.builder()
-                .categoryId(2L).hashTagId(null).title("스터디").status("PROGRESS").build();
-        findPosts(request)
+        findPosts(2L, null, "스터디", "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", is("스프링 스터디")));
     }
@@ -144,9 +133,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "모집완료" -> post1, post5
-        var request = PostsRequest.builder()
-                .categoryId(2L).hashTagId(null).title("").status("COMPLETED").build();
-        findPosts(request)
+        findPosts(2L, null, null, "COMPLETED")
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].title", is("코테 스터디")))
                 .andExpect(jsonPath("$[1].title", is("iOS 공부해요")));
@@ -158,9 +145,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "어학", "모집완료" -> 없음
-        var request = PostsRequest.builder()
-                .categoryId(null).hashTagId(null).title("어학").status("COMPLETED").build();
-        findPosts(request)
+        findPosts(null, null, "어학", "COMPLETED")
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
@@ -170,9 +155,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "스프링" -> post4
-        var request = PostsRequest.builder()
-                .categoryId(2L).hashTagId(10L).title("스프링").status("PROGRESS").build();
-        findPosts(request)
+        findPosts(2L, 10L, "스프링", "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", is("스프링 스터디")));
     }
@@ -183,9 +166,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "모집완료" -> post1
-        var request = PostsRequest.builder()
-                .categoryId(2L).hashTagId(10L).title("").status("COMPLETED").build();
-        findPosts(request)
+        findPosts(2L, 10L, null, "COMPLETED")
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", is("코테 스터디")));
     }
@@ -196,9 +177,8 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "어학" 카테고리, "토익 스피킹" 해시태그, "토스", "모집완료" -> 없음
-        var request = PostsRequest.builder()
-                .categoryId(1L).hashTagId(2L).title("토스").status("COMPLETED").build();
-        findPosts(request).andExpect(jsonPath("$", hasSize(0)));
+        findPosts(1L, 2L, "토스", "COMPLETED")
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @DisplayName("회원이 모집에 신청하고, 작성자는 신청을 수락한다")
@@ -431,10 +411,21 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON));
     }
 
-    private ResultActions findPosts(Object request) throws Exception {
-        return mockMvc.perform(get("/posts?page=0&size=12")
-                        .content(objectMapper.writeValueAsString(request))
-                        .contentType(MediaType.APPLICATION_JSON))
+    private ResultActions findPosts(Long categoryId, Long hashTagId, String title, String status) throws Exception {
+        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get("/posts?page=0&size=12");
+        if (categoryId != null) {
+            mockHttpServletRequestBuilder.param("categoryId", String.valueOf(categoryId));
+        }
+        if (hashTagId != null) {
+            mockHttpServletRequestBuilder.param("hashTagId", String.valueOf(hashTagId));
+        }
+        if (title != null) {
+            mockHttpServletRequestBuilder.param("title", title);
+        }
+        if (status != null) {
+            mockHttpServletRequestBuilder.param("status", status);
+        }
+        return mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isOk());
     }
 
