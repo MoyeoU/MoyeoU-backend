@@ -32,7 +32,7 @@ public class PostController {
 
     @Operation(summary = "게시물 조회")
     @GetMapping("/posts")
-    public List<PostsResponse> findAll(@RequestBody PostsRequest request, Pageable pageable) {
+    public List<PostsResponse> findAll(PostsRequest request, Pageable pageable) {
         return postService.findAll(
                 request.getTitle(), request.getCategoryId(),
                 request.getHashTagId(), request.getStatus(), pageable);
