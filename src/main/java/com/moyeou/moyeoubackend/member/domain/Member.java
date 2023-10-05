@@ -41,7 +41,9 @@ public class Member {
     private String introduction;
 
     @Column(name = "point")
-    private Double point;
+    private Double point = 0.0;
+
+    private Integer evaluationCount = 0;
 
     @OneToMany(mappedBy = "member", cascade = ALL, orphanRemoval = true)
     private List<MemberHashtag> memberHashtags = new ArrayList<>();
@@ -64,5 +66,10 @@ public class Member {
                         .filter(hashtag -> !this.memberHashtags.contains(hashtag))
                         .collect(Collectors.toList())
         );
+    }
+
+    public void calculatePoint(Double point) {
+        this.point = (this.point * evaluationCount + point) / (evaluationCount + 1);
+        evaluationCount++;
     }
 }

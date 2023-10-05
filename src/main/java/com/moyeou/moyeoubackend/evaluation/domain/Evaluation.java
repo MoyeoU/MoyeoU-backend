@@ -52,6 +52,7 @@ public class Evaluation {
         this.point = point;
         this.content = content;
         this.evaluated = true;
+        this.getEvaluatee().calculatePoint(point);
     }
 
     public boolean isEvaluator(Member member) {
