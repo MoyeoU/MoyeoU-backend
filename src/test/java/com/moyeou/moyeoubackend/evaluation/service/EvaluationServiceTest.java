@@ -2,6 +2,7 @@ package com.moyeou.moyeoubackend.evaluation.service;
 
 import com.moyeou.moyeoubackend.IntegrationTest;
 import com.moyeou.moyeoubackend.evaluation.controller.request.EvaluationRequest;
+import com.moyeou.moyeoubackend.evaluation.controller.response.EvaluationResponse;
 import com.moyeou.moyeoubackend.evaluation.domain.Evaluation;
 import com.moyeou.moyeoubackend.evaluation.repository.EvaluationRepository;
 import com.moyeou.moyeoubackend.member.domain.Member;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -32,16 +34,26 @@ public class EvaluationServiceTest extends IntegrationTest {
     void evaluate() {
         Member member1 = saveMember("member1@o.cnu.ac.kr");
         Member member2 = saveMember("member2@o.cnu.ac.kr");
+        Member member3 = saveMember("member3@o.cnu.ac.kr");
         Post post = savePost(member1);
-        Evaluation evaluation = evaluationRepository.save(new Evaluation(member1, member2, post));
 
-        evaluationService.evaluate(evaluation.getId(), new EvaluationRequest(5.0, "좋아요"));
+        Evaluation evaluation1 = evaluationRepository.save(new Evaluation(member1, member2, post));
+        Evaluation evaluation2 = evaluationRepository.save(new Evaluation(member3, member2, post));
+
+        // member1, member3이 member2를 평가
+        evaluationService.evaluate(evaluation1.getId(), new EvaluationRequest(5.0, "성실해요"));
+        evaluationService.evaluate(evaluation2.getId(), new EvaluationRequest(4.0, "good"));
+
+        // member2 평가 내역 조회
+        List<EvaluationResponse> evaluationList = evaluationService.findEvaluation(member2.getId());
 
         assertAll(
-                () -> assertThat(evaluation.getPoint()).isEqualTo(5.0),
-                () -> assertThat(evaluation.getContent()).isEqualTo("좋아요"),
-                () -> assertThat(evaluation.getEvaluated()).isTrue(),
-                () -> assertThat(evaluation.getEvaluatee()).isEqualTo(member2)
+                () -> assertThat(member2.getPoint()).isEqualTo(4.5),
+                () -> assertThat(evaluationList.size()).isEqualTo(2),
+                () -> assertThat(evaluationList.get(0).getPoint()).isEqualTo(5.0),
+                () -> assertThat(evaluationList.get(0).getContent()).isEqualTo("성실해요"),
+                () -> assertThat(evaluationList.get(1).getPoint()).isEqualTo(4.0),
+                () -> assertThat(evaluationList.get(1).getContent()).isEqualTo("good")
         );
     }
 

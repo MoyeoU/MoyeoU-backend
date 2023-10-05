@@ -58,7 +58,10 @@ public class MemberService {
     @Transactional
     public void update(Long memberId, MemberUpdateRequest request) {
         Member member = findById(memberId);
-        String path = fileUploader.upload(request.getFile());
+        String path = null;
+        if (request.getFile() != null) {
+            path = fileUploader.upload(request.getFile());
+        }
         List<MemberHashtag> memberHashtags = getMemberHashtags(request.getHashtags(), member);
         member.update(request.getIntroduction(), request.getNickname(), path, memberHashtags);
     }
