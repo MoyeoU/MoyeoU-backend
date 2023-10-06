@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PostResponse {
     private String title;
+    private LocalDate createdAt;
     private Integer headCount;
     private Integer currentCount;
     private String operationWay;
@@ -30,6 +32,7 @@ public class PostResponse {
     public static PostResponse from(Post post, Boolean isHost) {
         return new PostResponse(
                 post.getTitle(),
+                post.getCreatedAt(),
                 post.getHeadCount(),
                 post.getCurrentCount(),
                 post.getOperationWay(),

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostsResponse {
+    private Long postId;
     private String title;
     private PostStatus status;
     private Integer headCount;
@@ -23,6 +24,7 @@ public class PostsResponse {
 
     public static PostsResponse from(Post post) {
         return new PostsResponse(
+                post.getId(),
                 post.getTitle(),
                 post.getStatus(),
                 post.getHeadCount(),
