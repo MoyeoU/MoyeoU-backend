@@ -46,7 +46,7 @@ public class PostService {
     public PostResponse find(Long postId, Long memberId) {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
-        return PostResponse.from(post, post.isHost(member));
+        return PostResponse.from(post, member);
     }
 
     public List<PostsResponse> findAll(String title, Long categoryId, Long hashtagId, PostStatus status, Pageable pageable) {
