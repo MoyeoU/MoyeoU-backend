@@ -21,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class FileSystemStorageService implements FileUploader {
-    private static final String FILE_UPLOAD_PATH = "http://localhost:8080/files/";
+    private static final String FILE_UPLOAD_PATH = "http://52.79.241.162:8080/files/";
 
     private final Path rootLocation;
 
