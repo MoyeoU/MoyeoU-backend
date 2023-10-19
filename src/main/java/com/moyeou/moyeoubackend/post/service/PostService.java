@@ -4,6 +4,7 @@ import com.moyeou.moyeoubackend.common.exception.UnAuthorizedException;
 import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.member.repository.MemberRepository;
 import com.moyeou.moyeoubackend.post.controller.request.*;
+import com.moyeou.moyeoubackend.post.controller.response.AnswerResponse;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostsResponse;
@@ -105,7 +106,7 @@ public class PostService {
         participation.addAnswers(answers);
         postRepository.flush();
 
-        eventPublisher.publishEvent(new AttendEvent(memberId, postId, participation.getId()));
+        eventPublisher.publishEvent(new AttendEvent(memberId, postId));
         return participation.getId();
     }
 
@@ -117,13 +118,24 @@ public class PostService {
         eventPublisher.publishEvent(new CancelEvent(memberId, postId));
     }
 
+    public List<AnswerResponse> checkForm(Long participationId) {
+        Participation participation = findByParticipationId(participationId);
+        return participation.getAnswers().stream()
+                .map(it -> {
+                    String itemName = it.getItem().getName();
+                    String answer = it.getAnswer();
+                    return new AnswerResponse(itemName, answer);
+                })
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void accept(Long postId, Long participationId, Long memberId) {
         Member member = findByMemberId(memberId);
         Post post = findByPostId(postId);
         Participation participation = findByParticipationId(participationId);
         post.accept(member, participation);
-        eventPublisher.publishEvent(new AcceptEvent(postId, participationId));
+        eventPublisher.publishEvent(new AcceptEvent(participation.getMember().getId(), postId));
     }
 
     @Transactional
@@ -132,7 +144,7 @@ public class PostService {
         Post post = findByPostId(postId);
         Participation participation = findByParticipationId(participationId);
         post.reject(member, participation);
-        eventPublisher.publishEvent(new RejectEvent(postId, participationId));
+        eventPublisher.publishEvent(new RejectEvent(participation.getMember().getId(), postId));
     }
 
     @Transactional
