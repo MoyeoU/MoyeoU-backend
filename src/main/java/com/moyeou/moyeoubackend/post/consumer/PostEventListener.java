@@ -33,7 +33,7 @@ public class PostEventListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener
     public void handleAttendEvent(AttendEvent attendEvent) {
-        Member member = memberRepository.findById(attendEvent.getMemberId()).get();
+        Member member = memberRepository.findById(attendEvent.getMemberId()).orElseThrow();
         Post post = postRepository.findById(attendEvent.getPostId()).orElseThrow();
         Long hostId = post.getHost().getId();
 
@@ -60,8 +60,7 @@ public class PostEventListener {
     @TransactionalEventListener
     public void handleAcceptEvent(AcceptEvent acceptEvent) {
         Post post = postRepository.findById(acceptEvent.getPostId()).orElseThrow();
-        Participation participation = participationRepository.findById(acceptEvent.getParticipationId()).orElseThrow();
-        Long attendId = participation.getMember().getId();
+        Long attendId = acceptEvent.getMemberId();
 
         notificationService.sendMessage(attendId, "accept");
         Notification notification = new Notification(attendId, NotificationType.ACCEPT, post);
@@ -73,11 +72,9 @@ public class PostEventListener {
     @TransactionalEventListener
     public void handleRejectEvent(RejectEvent rejectEvent) {
         Post post = postRepository.findById(rejectEvent.getPostId()).orElseThrow();
-        Participation participation = participationRepository.findById(rejectEvent.getParticipationId()).orElseThrow();
-        Long attendId = participation.getMember().getId();
+        Long attendId = rejectEvent.getMemberId();
 
         notificationService.sendMessage(attendId, "reject");
-
         Notification notification = new Notification(attendId, NotificationType.REJECT, post);
         notificationRepository.save(notification);
     }
