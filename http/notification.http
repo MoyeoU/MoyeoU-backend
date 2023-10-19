@@ -1,75 +1,7 @@
-### 회원 가입(host)
-POST http://localhost:8080/sign-up
-Content-Type: application/json
-
-{
-  "email": "host@email.com",
-  "password": "password",
-  "nickname": "host",
-  "department": "컴퓨터공학과",
-  "studentNumber": "202300001"
-}
-
-### 로그인(host)
-POST http://localhost:8080/login
-Content-Type: application/json
-
-{
-  "email": "host@email.com",
-  "password": "password"
-}
-
-
-### 회원 가입(member1)
-POST http://localhost:8080/sign-up
-Content-Type: application/json
-
-{
-  "email": "member1@email.com",
-  "password": "password",
-  "nickname": "member1",
-  "department": "기계공학과",
-  "studentNumber": "202300002"
-}
-
-
-### 로그인(member1)
-POST http://localhost:8080/login
-Content-Type: application/json
-
-{
-  "email": "member1@email.com",
-  "password": "password"
-}
-
-
-### 회원 가입(member2)
-POST http://localhost:8080/sign-up
-Content-Type: application/json
-
-{
-  "email": "member2@email.com",
-  "password": "password",
-  "nickname": "member2",
-  "department": "기계공학과",
-  "studentNumber": "202300003"
-}
-
-
-### 로그인(member2)
-POST http://localhost:8080/login
-Content-Type: application/json
-
-{
-  "email": "member2@email.com",
-  "password": "password"
-}
-
-
 ### 게시물 생성
-POST http://localhost:8080/posts
+POST http://52.79.241.162:8080/posts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
+Authorization: Bearer
 
 {
   "operationWay": "온라인",
@@ -81,40 +13,71 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5L
   "items": [
     "Github",
     "흥미있는 분야"
+  ],
+  "hashtags": [
+    "공과대학",
+    "코딩테스트"
   ]
 }
 
+### 게시물 생성
+POST http://52.79.241.162:8080/posts
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "operationWay": "대면",
+  "headCount": 5,
+  "expectedDate": "2023-11-01",
+  "title": "모집합니다 모집합니다",
+  "estimatedDuration": "5개월",
+  "content": "코딩테스트 준비해요",
+  "items": [
+    "Github",
+    "사용 언어"
+  ],
+  "hashtags": [
+    "공과대학",
+    "코딩테스트",
+    "백엔드"
+  ]
+}
 
 ### 게시물 조회
-GET http://localhost:8080/posts/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
+GET http://52.79.241.162:8080/posts/4
+Authorization: Bearer
+
+
+### 게시물 삭제
+DELETE http://52.79.241.162:8080/posts/2
+Authorization: Bearer
 
 
 ### 게시물 신청 폼 조회
-GET http://localhost:8080/posts/1/form
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
+GET http://52.79.241.162:8080/posts/1/form
+Authorization: Bearer
 
 
-### 댓글 작성(member1)
-POST http://localhost:8080/posts/1/comments
+### 댓글 작성
+POST http://52.79.241.162:8080/posts/3/comments
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
+Authorization: Bearer
 
 {
-  "content": "~~~~~~~~?"
+  "content": "ㅋㅋㅋㅋㅋ"
 }
 
 
-### 모집 신청(member1)
-POST http://localhost:8080/posts/1/attend
+### 모집 신청
+POST http://52.79.241.162:8080/posts/1/attend
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
+Authorization: Bearer
 
 {
   "answers": [
     {
       "itemId": 1,
-      "answer": "abcd"
+      "answer": "https://github.com/abcd"
     },
     {
       "itemId": 2,
@@ -124,10 +87,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5L
 }
 
 
-### 모집 신청(member2)
-POST http://localhost:8080/posts/1/attend
+### 모집 신청
+POST http://52.79.241.162:8080/posts/1/attend
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNjkzODIxNDA4LCJleHAiOjE2OTM4MjUwMDh9.ouosB4OBgltHMaKrqYcTihYyKt8QkBrz_xPN2UJ_LNs
+Authorization: Bearer
 
 {
   "answers": [
@@ -144,30 +107,25 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNjkzODIxNDA4L
 
 
 ### 알림 확인(host)
-GET http://localhost:8080/notifications
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
+GET http://52.79.241.162:8080/notifications
+Authorization: Bearer
 
 
-### 신청 수락(host -> member1)
-POST http://localhost:8080/posts/1/participations/2/accept
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
+### 신청 수락
+POST http://52.79.241.162:8080/posts/1/participations/2/accept
+Authorization: Bearer
 
 
-### 신청 거절(host -> member2)
-POST http://localhost:8080/posts/1/participations/3/reject
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
+### 신청 거절
+POST http://52.79.241.162:8080/posts/1/participations/3/reject
+Authorization: Bearer
 
 
-### 알림 확인(member2)
-GET http://localhost:8080/notifications
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNjkzODIxNDA4LCJleHAiOjE2OTM4MjUwMDh9.ouosB4OBgltHMaKrqYcTihYyKt8QkBrz_xPN2UJ_LNs
+### 알림 확인
+GET http://52.79.241.162:8080/notifications
+Authorization: Bearer
 
 
 ### 모집 완료(host)
-POST http://localhost:8080/posts/1/complete
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjkzOTEzNDA5LCJleHAiOjE2OTM5MTcwMDl9.7lGn9tUVlXobuHE276mm8zr2dHB3Un5t58jsD1bJfLw
-
-
-### 알림 확인(member1)
-GET http://localhost:8080/notifications
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNjkzOTEzNDg5LCJleHAiOjE2OTM5MTcwODl9.mVoW7y2Qe8g-5gXlxsCRP1fFBneBD1eoh7jvDj75yd8
+POST http://52.79.241.162:8080/posts/1/complete
+Authorization: Bearer

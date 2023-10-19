@@ -1,42 +1,66 @@
-### 회원 가입
-POST http://localhost:8080/sign-up
+### 회원 가입(host)
+POST http://52.79.241.162:8080/sign-up
 Content-Type: application/json
 
 {
-  "email": "email@email.com",
+  "email": "host@email.com",
   "password": "password",
-  "nickname": "테스트 유저",
+  "nickname": "host",
   "department": "컴퓨터공학과",
   "studentNumber": "202300001"
 }
 
-### 로그인
-POST http://localhost:8080/login
+### 로그인(host)
+POST http://52.79.241.162:8080/login
 Content-Type: application/json
 
 {
-  "email": "email@email.com",
+  "email": "host@email.com",
   "password": "password"
 }
 
 
-### 회원 가입
-POST http://localhost:8080/sign-up
+### 회원 가입(member1)
+POST http://52.79.241.162:8080/sign-up
 Content-Type: application/json
 
 {
-  "email": "test@email.com",
+  "email": "member1@email.com",
   "password": "password",
-  "nickname": "신규 유저",
+  "nickname": "member1",
   "department": "기계공학과",
   "studentNumber": "202300002"
 }
 
-### 로그인
-POST http://localhost:8080/login
+
+### 로그인(member1)
+POST http://52.79.241.162:8080/login
 Content-Type: application/json
 
 {
-  "email": "test@email.com",
+  "email": "member1@email.com",
+  "password": "password"
+}
+
+
+### 회원 가입(member2)
+POST http://52.79.241.162:8080/sign-up
+Content-Type: application/json
+
+{
+  "email": "member2@email.com",
+  "password": "password",
+  "nickname": "member2",
+  "department": "기계공학과",
+  "studentNumber": "202300003"
+}
+
+
+### 로그인(member2)
+POST http://52.79.241.162:8080/login
+Content-Type: application/json
+
+{
+  "email": "member2@email.com",
   "password": "password"
 }

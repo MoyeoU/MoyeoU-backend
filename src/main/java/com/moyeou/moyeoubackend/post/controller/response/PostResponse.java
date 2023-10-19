@@ -1,6 +1,7 @@
 package com.moyeou.moyeoubackend.post.controller.response;
 
 import com.moyeou.moyeoubackend.member.controller.response.HostResponse;
+import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.post.domain.Post;
 import com.moyeou.moyeoubackend.post.domain.PostStatus;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class PostResponse {
     private Boolean isHost;
     private List<CommentResponse> comments;
 
-    public static PostResponse from(Post post, Boolean isHost) {
+    public static PostResponse from(Post post, Member viewer) {
         return new PostResponse(
                 post.getTitle(),
                 post.getCreatedAt(),
@@ -44,9 +45,9 @@ public class PostResponse {
                         .collect(Collectors.toList()),
                 HostResponse.from(post.getHost()),
                 post.getContent(),
-                isHost,
+                post.isHost(viewer),
                 post.getComments().stream()
-                        .map(CommentResponse::from)
+                        .map(Comment -> CommentResponse.from(Comment, viewer))
                         .collect(Collectors.toList())
         );
     }

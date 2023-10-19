@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.post.controller.response;
 
+import com.moyeou.moyeoubackend.member.domain.Member;
 import com.moyeou.moyeoubackend.post.domain.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,10 +16,13 @@ public class CommentResponse {
     private String nickname;
     private String content;
     private LocalDateTime time;
+    private Boolean isAuthor;
 
-    public static CommentResponse from(Comment comment) {
+    public static CommentResponse from(Comment comment, Member viewer) {
         return new CommentResponse(
-                comment.getId(), comment.getMember().getNickname(), comment.getContent(), comment.getCreatedAt()
+                comment.getId(), comment.getMember().getNickname(),
+                comment.getContent(), comment.getCreatedAt(),
+                comment.isAuthor(viewer)
         );
     }
 }
