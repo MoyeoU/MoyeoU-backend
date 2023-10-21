@@ -1,5 +1,6 @@
 package com.moyeou.moyeoubackend.file.controller;
 
+import com.moyeou.moyeoubackend.file.controller.request.ImageUploadRequest;
 import com.moyeou.moyeoubackend.file.service.FileSystemStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,7 +10,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +29,10 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
                 .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
                 .body(file);
+    }
+
+    @PostMapping("/images")
+    public String saveImage(@Valid ImageUploadRequest request) {
+        return fileSystemStorageService.upload(request.getImage());
     }
 }
