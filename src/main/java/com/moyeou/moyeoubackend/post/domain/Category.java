@@ -14,7 +14,6 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class Category {
     @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "category_id")
     private Long id;
 
     @Column(name = "name", nullable = false)
