@@ -22,7 +22,7 @@ public class DataCleanupController {
     @Operation(summary = "모든 데이터 삭제")
     @DeleteMapping("/all-data")
     public String clean(@RequestParam String key) {
-        if (key.equals(adminKey)) {
+        if (adminKey.equals(key)) {
             dataCleanupService.execute();
             return "success";
         }
