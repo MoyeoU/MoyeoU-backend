@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DataCleanupService {
+    private static final List<String> NOT_TO_BE_DELETED = List.of("category", "hashtag");
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -48,6 +50,9 @@ public class DataCleanupService {
         entityManager.flush();
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
         for (String tableName : tableNames) {
+            if (NOT_TO_BE_DELETED.contains(tableName)) {
+                continue;
+            }
             entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
             entityManager.createNativeQuery("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1")
                     .executeUpdate();
