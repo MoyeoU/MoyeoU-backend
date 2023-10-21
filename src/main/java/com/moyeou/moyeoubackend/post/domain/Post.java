@@ -31,7 +31,6 @@ import static lombok.AccessLevel.PROTECTED;
 public class Post {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "post_id")
     private Long id;
 
     @Column(name = "title", nullable = false)

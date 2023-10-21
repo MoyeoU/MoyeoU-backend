@@ -16,7 +16,6 @@ import static lombok.AccessLevel.PROTECTED;
 public class Hashtag {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "hashtag_id")
     private Long id;
 
     @Column(name = "name", nullable = false)

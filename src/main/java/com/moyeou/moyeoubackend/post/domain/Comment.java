@@ -20,7 +20,6 @@ import static lombok.AccessLevel.PROTECTED;
 public class Comment {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "comment_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)

@@ -17,7 +17,6 @@ import static lombok.AccessLevel.PROTECTED;
 public class Evaluation {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "evaluation_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)

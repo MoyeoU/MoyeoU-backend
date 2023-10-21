@@ -21,7 +21,6 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class Participation {
     @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "participation_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
