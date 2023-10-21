@@ -16,7 +16,6 @@ import static lombok.AccessLevel.PROTECTED;
 public class MemberHashtag {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "member_hashtag_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
