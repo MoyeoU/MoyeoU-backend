@@ -28,6 +28,7 @@ public class PostResponse {
     private HostResponse host;
     private String content;
     private Boolean isHost;
+    private Boolean attended;
     private List<CommentResponse> comments;
 
     public static PostResponse from(Post post, Member viewer) {
@@ -46,6 +47,8 @@ public class PostResponse {
                 HostResponse.from(post.getHost()),
                 post.getContent(),
                 post.isHost(viewer),
+                post.getParticipations().stream()
+                        .anyMatch(p -> p.getMember().equals(viewer)),
                 post.getComments().stream()
                         .map(Comment -> CommentResponse.from(Comment, viewer))
                         .collect(Collectors.toList())

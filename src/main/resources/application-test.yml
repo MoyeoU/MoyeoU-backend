@@ -21,3 +21,5 @@ spring:
 jwt:
   secret-key: "secret-test"
   refresh-key: "refresh-test"
+
+file-path: "http://localhost:8080/files/"

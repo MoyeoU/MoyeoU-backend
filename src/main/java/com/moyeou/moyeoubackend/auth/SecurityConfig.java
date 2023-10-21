@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(STATELESS);
         http
                 .authorizeRequests()
-                .antMatchers("/sign-up", "/login", "/refresh", "/api-docs/**","/swagger-ui/**").permitAll()
+                .antMatchers("/sign-up", "/login", "/refresh", "/api-docs/**","/swagger-ui/**", "/files/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/posts").permitAll()
                 .anyRequest().authenticated()
                 .and()

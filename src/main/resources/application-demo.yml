@@ -1,13 +1,13 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/MOYEOU_DB?serverTimezone=Asia/Seoul
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:MOYEOU_DB
     username: user
     password: password
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -19,7 +19,7 @@ spring:
       mode: always
 
 jwt:
-  secret-key: "secret-local"
-  refresh-key: "refresh-local"
+  secret-key: "secret-test"
+  refresh-key: "refresh-test"
 
-file-path: "http://localhost:8080/files/"
+file-path: "http://52.79.241.162:8080/files/"

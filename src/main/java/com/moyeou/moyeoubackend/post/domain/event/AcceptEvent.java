@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class AcceptEvent {
+    private Long memberId;
     private Long postId;
-    private Long participationId;
 
-    public AcceptEvent(Long postId, Long participationId) {
+    public AcceptEvent(Long memberId, Long postId) {
+        this.memberId = memberId;
         this.postId = postId;
-        this.participationId = participationId;
     }
 }

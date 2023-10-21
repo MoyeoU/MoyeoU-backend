@@ -2,6 +2,7 @@ package com.moyeou.moyeoubackend.post.controller;
 
 import com.moyeou.moyeoubackend.auth.supports.LoginMember;
 import com.moyeou.moyeoubackend.post.controller.request.*;
+import com.moyeou.moyeoubackend.post.controller.response.AnswerResponse;
 import com.moyeou.moyeoubackend.post.controller.response.ItemResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostResponse;
 import com.moyeou.moyeoubackend.post.controller.response.PostsResponse;
@@ -67,6 +68,12 @@ public class PostController {
     public ResponseEntity<Void> attend(@PathVariable Long postId, @LoginMember Long memberId, @RequestBody AttendRequest request) {
         Long participationId = postService.attend(postId, memberId, request);
         return ResponseEntity.created(URI.create(String.format("/posts/%d/participations/%d", postId, participationId))).build();
+    }
+
+    @Operation(summary = "참가 신청폼 확인")
+    @GetMapping("/participations/{participationId}")
+    public List<AnswerResponse> checkForm(@PathVariable Long participationId) {
+        return postService.checkForm(participationId);
     }
 
     @Operation(summary = "신청 취소")
