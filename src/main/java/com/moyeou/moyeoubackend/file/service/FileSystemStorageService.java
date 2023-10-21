@@ -3,6 +3,7 @@ package com.moyeou.moyeoubackend.file.service;
 import com.moyeou.moyeoubackend.file.exception.StorageException;
 import com.moyeou.moyeoubackend.file.StorageProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,11 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class FileSystemStorageService implements FileUploader {
-    private static final String FILE_UPLOAD_PATH = "http://52.79.241.162:8080/files/";
 
     private final Path rootLocation;
+
+    @Value("${file-path}")
+    private String filePath;
 
     public FileSystemStorageService(StorageProperties properties) {
         this.rootLocation = Paths.get(properties.getLocation());
@@ -49,7 +52,7 @@ public class FileSystemStorageService implements FileUploader {
             String filename = UUID.randomUUID() + extension;
 
             Files.copy(file.getInputStream(), this.rootLocation.resolve(filename));
-            return FILE_UPLOAD_PATH + filename;
+            return filePath + filename;
         } catch (IOException e) {
             throw new StorageException("파일 저장에 실패했습니다: " + file.getOriginalFilename(), e);
         }
