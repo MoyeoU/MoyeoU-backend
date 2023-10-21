@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentResponse {
     private Long commentId;
+    private Long authorId;
     private String nickname;
     private String content;
     private LocalDateTime time;
@@ -20,8 +21,11 @@ public class CommentResponse {
 
     public static CommentResponse from(Comment comment, Member viewer) {
         return new CommentResponse(
-                comment.getId(), comment.getMember().getNickname(),
-                comment.getContent(), comment.getCreatedAt(),
+                comment.getId(),
+                comment.getMember().getId(),
+                comment.getMember().getNickname(),
+                comment.getContent(),
+                comment.getCreatedAt(),
                 comment.isAuthor(viewer)
         );
     }
