@@ -41,7 +41,7 @@ public class MemberController {
 
     @Operation(summary = "정보 수정")
     @PutMapping("/members/me")
-    public void update(@LoginMember Long memberId, @Valid MemberUpdateRequest request) {
+    public void update(@LoginMember Long memberId, @Valid @RequestBody MemberUpdateRequest request) {
         memberService.update(memberId, request);
     }
 
