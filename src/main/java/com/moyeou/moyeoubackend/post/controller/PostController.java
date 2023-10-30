@@ -36,7 +36,7 @@ public class PostController {
     public List<PostsResponse> findAll(PostsRequest request, Pageable pageable) {
         return postService.findAll(
                 request.getTitle(), request.getCategoryId(),
-                request.getHashTagId(), request.getStatus(), pageable);
+                request.getHashTagIds(), request.getStatus(), pageable);
     }
 
     @Operation(summary = "게시물 상세 조회")

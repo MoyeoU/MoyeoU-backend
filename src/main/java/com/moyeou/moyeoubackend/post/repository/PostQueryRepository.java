@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 public class PostQueryRepository {
     private final PostRepository postRepository;
 
-    public List<Post> findAllByCondition(String title, Long categoryId, Long hashTagId, PostStatus status, Pageable pageable) {
+    public List<Post> findAllByCondition(String title, Long categoryId, List<Long> hashTagIds, PostStatus status, Pageable pageable) {
         List<Post> posts = postRepository.findAll()
                 .stream()
-                .filter(post -> matches(post, title, categoryId, hashTagId, status))
+                .filter(post -> matches(post, title, categoryId, hashTagIds, status))
                 .collect(Collectors.toList());
 
         List<Post> results = new ArrayList<>();
@@ -31,10 +31,10 @@ public class PostQueryRepository {
         return results;
     }
 
-    private boolean matches(Post post, String title, Long categoryId, Long hashTagId, PostStatus status) {
+    private boolean matches(Post post, String title, Long categoryId, List<Long> hashTagIds, PostStatus status) {
         return post.getTitle().contains(title)
                 && post.getStatus() == status
-                && 해시태그_일치(post, hashTagId)
+                && 해시태그_포함(post, hashTagIds)
                 && 카테고리_일치(post, categoryId);
     }
 
@@ -50,14 +50,14 @@ public class PostQueryRepository {
                 .anyMatch(id -> id.equals(categoryId));
     }
 
-    private boolean 해시태그_일치(Post post, Long hashTagId) {
-        if (hashTagId == null) {
+    private boolean 해시태그_포함(Post post, List<Long> hashTagIds) {
+        if (hashTagIds == null || hashTagIds.isEmpty()) {
             return true;
         }
         return post.getPostHashtags()
                 .stream()
                 .map(PostHashtag::getHashtag)
                 .map(Hashtag::getId)
-                .anyMatch(id -> id.equals(hashTagId));
+                .anyMatch(hashTagIds::contains);
     }
 }
