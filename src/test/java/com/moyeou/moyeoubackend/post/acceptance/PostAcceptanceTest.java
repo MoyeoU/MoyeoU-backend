@@ -111,7 +111,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "어학" 카테고리, "토익" 해시태그 -> post3, post6
-        findPosts(1L, 1L, null, "PROGRESS")
+        findPosts(1L, List.of(1L), null, "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].hashtags", everyItem(hasItem("토익"))));
     }
@@ -155,7 +155,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "스프링" -> post4
-        findPosts(2L, 10L, "스프링", "PROGRESS")
+        findPosts(2L, List.of(10L), "스프링", "PROGRESS")
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", is("스프링 스터디")));
     }
@@ -166,7 +166,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "프로그래밍" 카테고리, "코딩테스트" 해시태그, "모집완료" -> post1
-        findPosts(2L, 10L, null, "COMPLETED")
+        findPosts(2L, List.of(10L), null, "COMPLETED")
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", is("코테 스터디")));
     }
@@ -177,7 +177,7 @@ public class PostAcceptanceTest extends AcceptanceTest {
         createPostsAndUpdateStatus();
 
         // "어학" 카테고리, "토익 스피킹" 해시태그, "토스", "모집완료" -> 없음
-        findPosts(1L, 2L, "토스", "COMPLETED")
+        findPosts(1L, List.of(2L), "토스", "COMPLETED")
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
@@ -411,13 +411,15 @@ public class PostAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON));
     }
 
-    private ResultActions findPosts(Long categoryId, Long hashTagId, String title, String status) throws Exception {
+    private ResultActions findPosts(Long categoryId, List<Long> hashTagIds, String title, String status) throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get("/posts?page=0&size=12");
         if (categoryId != null) {
             mockHttpServletRequestBuilder.param("categoryId", String.valueOf(categoryId));
         }
-        if (hashTagId != null) {
-            mockHttpServletRequestBuilder.param("hashTagId", String.valueOf(hashTagId));
+        if (hashTagIds != null) {
+            mockHttpServletRequestBuilder.param("hashTagIds", hashTagIds.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(",")));
         }
         if (title != null) {
             mockHttpServletRequestBuilder.param("title", title);

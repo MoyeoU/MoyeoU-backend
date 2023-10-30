@@ -50,8 +50,8 @@ public class PostService {
         return PostResponse.from(post, member);
     }
 
-    public List<PostsResponse> findAll(String title, Long categoryId, Long hashtagId, PostStatus status, Pageable pageable) {
-        return postQueryRepository.findAllByCondition(title, categoryId, hashtagId, status, pageable)
+    public List<PostsResponse> findAll(String title, Long categoryId, List<Long> hashtagIds, PostStatus status, Pageable pageable) {
+        return postQueryRepository.findAllByCondition(title, categoryId, hashtagIds, status, pageable)
                 .stream()
                 .map(PostsResponse::from)
                 .collect(Collectors.toList());
