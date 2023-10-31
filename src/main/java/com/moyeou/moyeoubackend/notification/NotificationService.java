@@ -1,12 +1,15 @@
 package com.moyeou.moyeoubackend.notification;
 
 import com.moyeou.moyeoubackend.notification.controller.response.NotificationResponse;
+import com.moyeou.moyeoubackend.notification.domain.Notification;
 import com.moyeou.moyeoubackend.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,5 +47,12 @@ public class NotificationService {
                 .stream()
                 .map(NotificationResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteNotification(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("알림(" + notificationId + ")이 존재하지 않습니다."));
+        notification.delete();
     }
 }

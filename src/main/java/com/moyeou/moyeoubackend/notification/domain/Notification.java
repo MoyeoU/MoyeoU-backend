@@ -27,6 +27,9 @@ public class Notification {
     @Column(name = "type", nullable = false)
     private NotificationType type;
 
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -40,11 +43,17 @@ public class Notification {
         this.type = type;
         this.member = member;
         this.post = post;
+        this.deleted = false;
     }
 
     public Notification(Long receiverId, NotificationType type, Post post) {
         this.receiverId = receiverId;
         this.type = type;
         this.post = post;
+        this.deleted = false;
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 }

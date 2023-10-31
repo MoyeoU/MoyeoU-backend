@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS notification
     type            VARCHAR(255) NOT NULL,
     member_id       BIGINT,
     post_id         BIGINT,
+    deleted         BOOLEAN,
     PRIMARY KEY (id)
 );
 
@@ -97,7 +98,7 @@ CREATE TABLE IF NOT EXISTS participation
 CREATE TABLE IF NOT EXISTS post
 (
     id                 BIGINT AUTO_INCREMENT,
-    content            VARCHAR(255) NOT NULL,
+    content            LONGTEXT     NOT NULL,
     created_at         DATE         NOT NULL,
     current_count      INTEGER      NOT NULL,
     estimated_duration VARCHAR(255) NOT NULL,
