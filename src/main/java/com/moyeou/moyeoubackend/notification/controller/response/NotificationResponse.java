@@ -14,6 +14,8 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationResponse {
+    private Long notificationId;
+    private Boolean deleted;
     private Long receiverId;
     private NotificationType type;
     private Long memberId;
@@ -34,6 +36,8 @@ public class NotificationResponse {
                 .map(Participation::getId).orElse(null);
 
         return new NotificationResponse(
+                notification.getId(),
+                notification.getDeleted(),
                 notification.getReceiverId(),
                 notification.getType(),
                 memberId,

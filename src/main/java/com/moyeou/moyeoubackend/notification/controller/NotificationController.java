@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -29,5 +31,11 @@ public class NotificationController {
     @GetMapping(value = "/notifications")
     public List<NotificationResponse> notifications(@LoginMember Long memberId) {
         return notificationService.checkNotification(memberId);
+    }
+
+    @Operation(summary = "알림 삭제")
+    @PostMapping(value = "/notifications/{notificationId}")
+    public void delete(@PathVariable Long notificationId) {
+        notificationService.deleteNotification(notificationId);
     }
 }

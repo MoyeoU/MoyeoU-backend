@@ -54,3 +54,5 @@ insert into hashtag (id, name, category_id) values (40, '의사', 6) ON DUPLICAT
 insert into hashtag (id, name, category_id) values (41, '행정고시', 6) ON DUPLICATE KEY UPDATE id = id;
 insert into hashtag (id, name, category_id) values (42, '외무고시', 6) ON DUPLICATE KEY UPDATE id = id;
 insert into hashtag (id, name, category_id) values (43, '공무원', 6) ON DUPLICATE KEY UPDATE id = id;
+
+insert into hashtag (id, name, category_id) values (44, '기타', 7) ON DUPLICATE KEY UPDATE id = id;
